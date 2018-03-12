@@ -661,6 +661,4 @@ public class FormationOfSolutions {
 			}
 		}
 	}
-
-	
 }
