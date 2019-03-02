@@ -1,5 +1,3 @@
-package theComputationOfTheRootsOfAnyEquation;
-
 import java.math.BigDecimal;
 
 import org.apfloat.Apcomplex;
@@ -182,43 +180,62 @@ public class ComplexBigDecimal {
 		return result;
 	}
 	
-	public boolean compareToZero() {
+	/**
+	 * –†–∞–≤–Ω–æ –ª–∏ —á–∏—Å–ª–æ –Ω—É–ª—é
+	 */
+	
+	public boolean isEqualToZero() {
 		return real.compareTo(BigDecimal.ZERO) == 0 && imag.compareTo(BigDecimal.ZERO) == 0;
 	}
 	
-	public boolean compareToNotZero() {
-		return real.compareTo(BigDecimal.ZERO) != 0 && imag.compareTo(BigDecimal.ZERO) != 0;
+	/**
+	 * –ù–µ —Ä–∞–≤–Ω–æ –ª–∏ —á–∏—Å–ª–æ –Ω—É–ª—é
+	 */
+	
+	public boolean isNotEqualToZero() {
+		return !isEqualRealToZero() && !isEqualImagToZero();
 	}
 	
-	public boolean compareRealToZero() {
+	/**
+	 * –†–∞–≤–Ω–∞ –ª–∏ –¥–µ–π—Å—Ç–≤–∏—Ç–µ–ª—å–Ω–∞—è —á–∞—Å—Ç—å —á–∏—Å–ª–∞ –Ω—É–ª—é
+	 */
+	
+	public boolean isEqualRealToZero() {
 		return real.compareTo(BigDecimal.ZERO) == 0;
 	}
 	
-	public boolean compareImagToZero() {
+	/**
+	 * –†–∞–≤–Ω–∞ –ª–∏ –º–Ω–∏–º–∞—è —á–∞—Å—Ç—å —á–∏—Å–ª–∞ –Ω—É–ª—é
+	 */
+	
+	public boolean isEqualImagToZero() {
 		return imag.compareTo(BigDecimal.ZERO) == 0;
 	}
 	
-	public boolean compareTo(ComplexBigDecimal a) {
+	/**
+	 * –†–∞–≤–Ω–æ –ª–∏ —á–∏—Å–ª–æ –¥–∞–Ω–Ω–æ–º—É
+	 * @param a - –¥–∞–Ω–Ω–æ–µ —á–∏—Å–ª–æ —Ç–∏–ø–∞ ComplexBigDecimal
+	 */
+	
+	public boolean isEqualTo(ComplexBigDecimal a) {
 		return real.compareTo(a.getReal()) == 0 && imag.compareTo(a.getImag()) == 0;
 	}
 	
-	public boolean compareTo(BigDecimal a) {
-		return real.compareTo(a) == 0 && imag.compareTo(a) == 0;
-	}
+	/**
+	 * –°—Ä–∞–≤–Ω–µ–Ω–∏–µ –¥–µ–π—Å—Ç–≤–∏—Ç–µ–ª—å–Ω–æ–π —á–∞—Å—Ç–∏ —á–∏—Å–ª–∞ —Å –Ω—É–ª—ë–º
+	 * @return -1, –µ—Å–ª–∏ Re(z) < 0 <br> 0, –µ—Å–ª–∏ Re(z) == 0 <br> 1, –µ—Å–ª–∏ Re(z) > 0
+	 */
 	
-	public int compareRealTo(BigDecimal a) {
-		return real.compareTo(a);
+	public int compareRealToZero() { 
+		return real.compareTo(BigDecimal.ZERO); 
 	}
+
+	/**
+	 * –°—Ä–∞–≤–Ω–µ–Ω–∏–µ –º–Ω–∏–º–æ–π —á–∞—Å—Ç–∏ —á–∏—Å–ª–∞ —Å –Ω—É–ª—ë–º
+	 * @return -1, –µ—Å–ª–∏ Im(z) < 0 <br> 0, –µ—Å–ª–∏ Im(z) == 0 <br> 1, –µ—Å–ª–∏ Im(z) > 0
+	 */
 	
-	public int compareRealTo() {
-		return real.compareTo(BigDecimal.ZERO);
-	}
-	
-	public int compareImagTo(BigDecimal a) {
-		return imag.compareTo(a);
-	}
-	
-	public int compareImagTo() {
+	public int compareImagToZero() {
 		return imag.compareTo(BigDecimal.ZERO);
 	}
 	
@@ -246,14 +263,8 @@ public class ComplexBigDecimal {
 		imag = imag.setScale(scale, type_of_rounding);
 		return this;
 	}
-	//									  ‰Îˇ ‚‚Ó‰‡ ÍÓ˝Ù	Ó·˚˜ ‚Ë‰ ËÎË ˝ÍÒÔÓÌÂÌ    ÍÓÌÒÚ ‰Îˇ latex	  ÚÓ˜ÌÓÒÚ¸ ‚˚˜ËÒÎÂÌËÈ    ÚÓ˜ÌÓÒÚ¸ ÓÚÓ·‡ÊÂÌËˇ
+	
 	public String formattedString(boolean isOutput, boolean isNormalView, boolean isSimpleExponentialView, int accuracyRound, int accuracyView) {
-					//Ó·˚˜Ì˚Â ÁÌ‡˜ÂÌËˇ   true           ÏÂÌˇÂÚÒˇ              true                         ÏÂÌˇÂÚÒˇ ‚ Main    ÏÂÌˇÂÚÒˇ
-						
-						//ÔË 
-						//‚‚Ó‰Â
-						//ÍÓ˝Ù ‚ Â¯ÂÌËË	 false                                false                        
-		
 		String output;
 		this.isSimpleExponentialView = isSimpleExponentialView;
 		this.isOutput = isOutput;
@@ -427,18 +438,16 @@ public class ComplexBigDecimal {
 			int exp = 0;
 			try {
 				if (a.abs().doubleValue() >= 10) {
-					for (; a.doubleValue() >= 10 || a.doubleValue() <= -10;) {
+					while(a.doubleValue() >= 10 || a.doubleValue() <= -10) {
 						a = a.divide(BigDecimal.TEN, 30, BigDecimal.ROUND_CEILING);
 						exp++;
-					}
-					;
+					};
 				}
 				if (a.abs().doubleValue() < 1) {
-					for (; a.abs().doubleValue() < 1;) {
+					while(a.abs().doubleValue() < 1) {
 						a = a.multiply(BigDecimal.TEN);
 						exp--;
-					}
-					;
+					};
 				}
 			} catch (final Exception e) {
 				e.printStackTrace();

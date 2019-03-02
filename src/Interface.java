@@ -1,5 +1,3 @@
-package theComputationOfTheRootsOfAnyEquation;
-
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
@@ -53,9 +51,9 @@ public class Interface extends JFrame {
 	private KeyListener[] textFilter = new KeyListener[5];
 	private JLabel[] label = new JLabel[9];
 	private static JTextField[] textField = new JTextField[9];
-	private JButton calculationButton, resetButton, helpButton, solutionButton, preferencesButton;
-	private String[] labelText = { "коэф. A", "коэф. B", "коэф. C", "коэф. D", "коэф. E", "x1 =", "x2 =", "x3 =", "x4 =" };
-	private String[] labelInfoText = { "<html><font size=5>Общий вид уравнения: Ax + B = 0", "<html><font size=5>Общий вид уравнения: Ax&sup2 + Bx + C = 0", "<html><font size=5>Общий вид уравнения: Ax&sup3 + Bx&sup2 + Cx + D = 0", "<html><font size=5>вид уравнения: Ax<font size = 3><sup><small>4</sup><small></font>" + "<html><font size=5> + Bx&sup3 + Cx&sup2 + Dx + E = 0" };
+	private JButton calculationButton, resetButton, aboutButton, solutionButton, preferencesButton;
+	private String[] labelText = { "РљРѕСЌС„. A", "РљРѕСЌС„. B", "РљРѕСЌС„. C", "РљРѕСЌС„. D", "РљРѕСЌС„. E", "x1 =", "x2 =", "x3 =", "x4 =" };
+	private String[] labelInfoText = { "<html><font size=5>РћР±С‰РёР№ РІРёРґ СѓСЂР°РІРЅРµРЅРёСЏ: Ax + B = 0", "<html><font size=5>РћР±С‰РёР№ РІРёРґ СѓСЂР°РІРЅРµРЅРёСЏ: Ax&sup2 + Bx + C = 0", "<html><font size=5>РћР±С‰РёР№ РІРёРґ СѓСЂР°РІРЅРµРЅРёСЏ: Ax&sup3 + Bx&sup2 + Cx + D = 0", "<html><font size=5>РІРёРґ СѓСЂР°РІРЅРµРЅРёСЏ: Ax<font size = 3><sup><small>4</sup><small></font>" + "<html><font size=5> + Bx&sup3 + Cx&sup2 + Dx + E = 0" };
 	Component horizontalGlue = Box.createHorizontalGlue();
 	Component horizontalGlue_1 = Box.createHorizontalGlue();
 	public static boolean isNormalView = true, openPreferences;
@@ -65,9 +63,9 @@ public class Interface extends JFrame {
 	private static boolean IS_QUADRATIC_EQUATION;
 	private static boolean IS_LINEAR_EQUATION;
 	public static Calculation calculation = new Calculation();
-	private FormationOfSolutions formation = new FormationOfSolutions();
+	private FormationOfSolution formation = new FormationOfSolution();
 	public Interface() {
-		super("Вычисление корней любого уравнения");
+		super("Vector");
 		createGUI();
 	}
 	public void createGUI() {
@@ -85,9 +83,9 @@ public class Interface extends JFrame {
 		slider.setMaximum(Main.SLIDER_MAX_VALUE);
 		slider.setMinimum(Main.SLIDER_MIN_VALUE);
 		slider.setValue(24);
-		radioButton_Normal = new JRadioButton("Обычное");
+		radioButton_Normal = new JRadioButton("РћР±С‹С‡РЅС‹Р№");
 		radioButton_Normal.setSelected(true);
-		radioButton_Exponential = new JRadioButton("Экспоненциальное");
+		radioButton_Exponential = new JRadioButton("Р­РєСЃРїРѕРЅРµРЅС†РёР°Р»СЊРЅС‹Р№");
 		radioButton_Exponential.setSelected(false);
 		
 		setIconImage(Toolkit.getDefaultToolkit().getImage(Interface.class.getResource("/com/sun/java/swing/plaf/windows/icons/Computer.gif")));
@@ -113,9 +111,9 @@ public class Interface extends JFrame {
 
 			@Override
 			public void windowClosing(WindowEvent event) {
-				final Object[] options = { "Да", "Нет" };
-				final int n = JOptionPane.showOptionDialog(event.getWindow(), "Закрыть программу?",
-						"Подтверждение закрытия", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+				final Object[] options = { "Р”Р°", "РќРµС‚" };
+				final int n = JOptionPane.showOptionDialog(event.getWindow(), "Р—Р°РєСЂС‹С‚СЊ РїСЂРѕРіСЂР°РјРјСѓ?",
+						"РџРѕРґС‚РІРµСЂР¶РґРµРЅРёРµ РґРµР№СЃС‚РІРёСЏ", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
 						null, options, options[0]);
 				if (n == 0) {
 					System.exit(0);
@@ -179,11 +177,11 @@ public class Interface extends JFrame {
 		panel.setPreferredSize(new Dimension(400, 10));
 		panel.setLayout(new GridLayout(0, 1, 0, 5));
 		box = new JComboBox<>();
-		box.setModel(new DefaultComboBoxModel<Object>(new String[] { "Линейное уравнение", "Квадратное уравнение ", "Кубическое уравнение ", "Уравнение четвёртой степени" }));
+		box.setModel(new DefaultComboBoxModel<Object>(new String[] { "Р›РёРЅРµР№РЅРѕРµ СѓСЂР°РІРЅРµРЅРёРµ", "РљРІР°РґСЂР°С‚РЅРѕРµ СѓСЂР°РІРЅРµРЅРёРµ", "РљСѓР±РёС‡РµСЃРєРѕРµ СѓСЂР°РІРЅРµРЅРёРµ", "РЈСЂР°РІРЅРµРЅРёРµ С‡РµС‚РІРµСЂС‚РѕР№ СЃС‚РµРїРµРЅРё" }));
 		panel.add(box);
 		
 		box.setSelectedIndex(0);
-		IS_LINEAR_EQUATION = true; // установка линейного уравнения в качестве начального
+		IS_LINEAR_EQUATION = true; 
 		
 		box.setEditable(false);
 		
@@ -310,16 +308,16 @@ public class Interface extends JFrame {
 		panel_3.add(panel_1);
 		panel_1.setBackground(SystemColor.activeCaption);
 		panel_1.setLayout(new GridLayout(0, 1, 0, 5));
-		calculationButton = new JButton("Вычислить");
+		calculationButton = new JButton("Р’С‹С‡РёСЃР»РёС‚СЊ");
 		panel_1.add(calculationButton);
-		solutionButton = new JButton("Решение");
+		solutionButton = new JButton("Р РµС€РµРЅРёРµ");
 		panel_1.add(solutionButton);
-		resetButton = new JButton("Сброс");
+		resetButton = new JButton("РЎР±СЂРѕСЃ");
 		panel_1.add(resetButton);
-		preferencesButton = new JButton("Настройки");
+		preferencesButton = new JButton("РќР°СЃС‚СЂРѕР№РєРё");
 		panel_1.add(preferencesButton);
-		helpButton = new JButton("Справка");
-		panel_1.add(helpButton);
+		aboutButton = new JButton("Рћ РїСЂРѕРіСЂР°РјРјРµ");
+		panel_1.add(aboutButton);
 		final JPanel panel_6 = new JPanel();
 		panel_6.setBackground(SystemColor.activeCaption);
 		panel_3.add(panel_6);
@@ -337,7 +335,7 @@ public class Interface extends JFrame {
 		
 		calculationButton.addActionListener(processing);
 		resetButton.addActionListener(processing);
-		helpButton.addActionListener(processing);
+		aboutButton.addActionListener(processing);
 		preferencesButton.addActionListener(processing);
 		solutionButton.addActionListener(processing);
 			
@@ -363,8 +361,8 @@ public class Interface extends JFrame {
 			}
 			if (event.getSource() == resetButton) {
 				if (!isEmpty(textField)) {
-					final Object[] options = { "Да", "Нет" };
-					final int n = JOptionPane.showOptionDialog(null, "Сбросить?", "Подтверждение сброса",
+					final Object[] options = { "Р”Р°", "РќРµС‚" };
+					final int n = JOptionPane.showOptionDialog(null, "РЎР±СЂРѕСЃРёС‚СЊ?", "РџРѕРґС‚РІРµСЂР¶РґРµРЅРёРµ СЃР±СЂРѕСЃР°",
 							JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 					if (n == 0) {
 						reset();
@@ -387,14 +385,10 @@ public class Interface extends JFrame {
 					}
 				});
 			}
-			if (event.getSource() == helpButton) {
-				JOptionPane.showMessageDialog(null, "Программа предназначена для вычисления \n"
-						+ "корней линейного, квадратного, кубического \n"
-						+ "уравнения и уравнения четвертой степени \n"
-						+ "как с действительными, так и \n"
-						+ "с комплексными коэффициентами. \n \n"
-						+ "Разработчик: Валентин Логачев \n \n"
-						+ "                          " + "2017 год", "Справка", JOptionPane.INFORMATION_MESSAGE);
+			if (event.getSource() == aboutButton) {
+				JOptionPane.showMessageDialog(null, "РџСЂРѕРіСЂР°РјРјР° РїСЂРµРґРЅР°Р·РЅР°С‡РµРЅР° РґР»СЏ РІС‹С‡РёСЃР»РµРЅРёСЏ РєРѕСЂРЅРµР№ \n" + "СѓСЂР°РІРЅРµРЅРёСЏ С‡РµС‚РІРµСЂС‚РѕР№ СЃС‚РµРїРµРЅРё, \n" 
+			        	+ "РєСѓР±РёС‡РµСЃРєРѕРіРѕ СѓСЂР°РІРЅРµРЅРёСЏ РёР»Рё РєРІР°РґСЂР°С‚РЅРѕРіРѕ СѓСЂР°РІРЅРµРЅРёСЏ \n" + "СЃ Р»СЋР±С‹РјРё РєРѕСЌС„С„РёС†РёРµРЅС‚Р°РјРё. "
+			        	+ "\n" + "Р Р°Р·СЂР°Р±РѕС‚С‡РёРє: Р’Р°Р»РµРЅС‚РёРЅ Р›РѕРіР°С‡РµРІ \n" + "\n                                   2017 РіРѕРґ", "Рћ РїСЂРѕРіСЂР°РјРјРµ", JOptionPane.INFORMATION_MESSAGE);
 				focus();
 			}
 		}
@@ -428,7 +422,7 @@ public class Interface extends JFrame {
 					tmp&= isEmptyTextField[j];
 				}
 				if (tmp) {
-					JOptionPane.showMessageDialog(null, "Введите коэффициенты!", "Ошибка", JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(null, "Р’РІРµРґРёС‚Рµ РєРѕСЌС„С„РёС†РёРµРЅС‚С‹!", "РћС€РёР±РєР°", JOptionPane.WARNING_MESSAGE);
 				} else {
 					for (int j = 0; j < i + 2; j++) {
 						processingEmptyTextField(textField[j]);
@@ -480,16 +474,16 @@ public class Interface extends JFrame {
 				try {
 					JFrame.setDefaultLookAndFeelDecorated(true);
 						if (IS_LINEAR_EQUATION) {
-						formation = new FormationOfSolutions(null, null, null, textField[0].getText(), textField[1].getText());
+						formation = new FormationOfSolution(null, null, null, textField[0].getText(), textField[1].getText());
 						}
 						if (IS_QUADRATIC_EQUATION) {
-						formation = new FormationOfSolutions(null, null, textField[0].getText(), textField[1].getText(), textField[2].getText());
+						formation = new FormationOfSolution(null, null, textField[0].getText(), textField[1].getText(), textField[2].getText());
 						}
 						if (IS_CUBIC_EQUATION) {
-						formation = new FormationOfSolutions(null, textField[0].getText(), textField[1].getText(), textField[2].getText(), textField[3].getText());
+						formation = new FormationOfSolution(null, textField[0].getText(), textField[1].getText(), textField[2].getText(), textField[3].getText());
 						}
 						if (IS_EQUATION_OF_FOURTH_POW) {
-						formation = new FormationOfSolutions(textField[0].getText(), textField[1].getText(), textField[2].getText(), textField[3].getText(), textField[4].getText());
+						formation = new FormationOfSolution(textField[0].getText(), textField[1].getText(), textField[2].getText(), textField[3].getText(), textField[4].getText());
 						}
 					final Solution solution = new Solution(formation.getSolutionDescription(), formation.getTextPNG(), k);
 					solution.setVisible(true);
@@ -550,7 +544,7 @@ public class Interface extends JFrame {
 
 	private void setEquationOfFourthPow() {
 		labelInfo.setText(labelInfoText[3]);
-		labelGlue.setText("Общий");
+		labelGlue.setText("РћР±С‰РёР№");
 		removeLabel();
 		createLabel(3);
 		label[8].setText("x4 = ");
@@ -665,15 +659,14 @@ public class Interface extends JFrame {
 	
 	public static void output(Calculation calculation) {
 		if (IS_EQUATION_OF_FOURTH_POW) {
-			textField[5].setText(calculation.getRoots()[0]);
-			textField[6].setText(calculation.getRoots()[1]);
-			textField[7].setText(calculation.getRoots()[2]);
-			textField[8].setText(calculation.getRoots()[3]);
+			for (int i = 0; i < 4; i++) {
+				textField[i + 5].setText(calculation.getRoots()[i]);
+			}
 		}
 		if (IS_CUBIC_EQUATION) {
-			textField[4].setText(calculation.getRoots()[0]);
-			textField[5].setText(calculation.getRoots()[1]);
-			textField[6].setText(calculation.getRoots()[2]);
+			for (int i = 0; i < 3; i++) {
+				textField[i + 4].setText(calculation.getRoots()[i]);
+			}
 		}
 		if (IS_QUADRATIC_EQUATION) {
 			textField[3].setText(calculation.getRoots()[0]);
@@ -684,4 +677,3 @@ public class Interface extends JFrame {
 		}
 	}
 }
-
