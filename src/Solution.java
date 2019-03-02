@@ -1,5 +1,3 @@
-package theComputationOfTheRootsOfAnyEquation;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
@@ -50,8 +48,7 @@ public class Solution extends JFrame implements ActionListener, WindowListener, 
 		this.solutionDescription = solutionDescription;
 		final TeXFormula formula = new TeXFormula(textPNG);
 		final Icon icon = formula.createTeXIcon(TeXConstants.STYLE_DISPLAY, 25);
-		image = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(),
-				BufferedImage.TYPE_INT_ARGB);
+		image = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
 		final Graphics2D g = image.createGraphics();
 		icon.paintIcon(new JLabel(), g, 0, 0);
 		JLabel label_solution = new JLabel(new ImageIcon(image));
@@ -93,7 +90,7 @@ public class Solution extends JFrame implements ActionListener, WindowListener, 
 		gbc_horizontalGlue_1.gridy = 1;
 		panel.add(horizontalGlue_1, gbc_horizontalGlue_1);
 		
-		bufferButton = new JButton("Копировать в HTML-код");
+		bufferButton = new JButton("РљРѕРїРёСЂРѕРІР°С‚СЊ РІ HTML");
 		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
 		gbc_btnNewButton.fill = GridBagConstraints.HORIZONTAL;
 		gbc_btnNewButton.insets = new Insets(0, 0, 0, 5);
@@ -110,7 +107,7 @@ public class Solution extends JFrame implements ActionListener, WindowListener, 
 		gbc_horizontalGlue.gridy = 1;
 		panel.add(horizontalGlue, gbc_horizontalGlue);
 		
-		saveButton = new JButton("Сохранить решение в png");
+		saveButton = new JButton("РЎРѕС…СЂР°РЅРёС‚СЊ РЅР° РґРёСЃРєРµ C РІ С„РѕСЂРјР°С‚Рµ png");
 		GridBagConstraints gbc_button = new GridBagConstraints();
 		gbc_button.insets = new Insets(0, 0, 0, 5);
 		gbc_button.fill = GridBagConstraints.HORIZONTAL;
@@ -129,7 +126,7 @@ public class Solution extends JFrame implements ActionListener, WindowListener, 
 		setSize(1100, 683);
 		setVisible(true);
 		setLocationRelativeTo(null);
-		setTitle("Описание решения");
+		setTitle("РћРїРёСЃР°РЅРёРµ СЂРµС€РµРЅРёСЏ");
 
 		addWindowListener(this);
 	}
@@ -171,9 +168,9 @@ public class Solution extends JFrame implements ActionListener, WindowListener, 
 			clipboard.setContents(stringSelection, this);
 		}
 		if (e.getSource() == saveButton) {
-			final Object[] options = { "Да", "Нет" };
-			final int n = JOptionPane.showOptionDialog(null, "Сохранить решение в файл?",
-				"Подтвеждение", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+			final Object[] options = { "Р”Р°", "РќРµС‚" };
+			final int n = JOptionPane.showOptionDialog(null, "РЎРѕС…СЂР°РЅРёС‚СЊ РЅР° РґРёСЃРє?",
+				"РџРѕРґС‚РІРµСЂР¶РґРµРЅРёРµ", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 			if (n == 0) {
 			file = new File("c:\\Solutions\\Solution" + k + ".png"); 
 			file.mkdirs();
@@ -181,13 +178,12 @@ public class Solution extends JFrame implements ActionListener, WindowListener, 
 			ImageIO.write(image, "png", file.getAbsoluteFile()); 
 			}
 			catch (IOException ex) {}
-			JOptionPane.showMessageDialog(null, "Решение сохранено в корне диска C в папке Solutions", "Справка", JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(null, "РЈСЃРїРµС€РЅРѕ", "", JOptionPane.INFORMATION_MESSAGE);
 			}
 		}
 	}
 
 	@Override
-	public void lostOwnership(Clipboard arg0, Transferable arg1) {
-	}
+	public void lostOwnership(Clipboard arg0, Transferable arg1) {}
 
 }
