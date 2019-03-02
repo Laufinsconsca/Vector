@@ -1,5 +1,3 @@
-package theComputationOfTheRootsOfAnyEquation;
-
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.event.InputEvent;
@@ -13,10 +11,10 @@ import javax.swing.text.JTextComponent;
 
 public class ContextMenuMouseListener extends MouseAdapter {
 	
-	private final static String CUTTEXT = "Вырезать";
-	private final static String SELECTALLTEXT = "Выделить все";
-	private final static String COPYTEXT = "Копировать";
-	private final static String PASTETEXT = "Вставить";
+	private final static String CUTTEXT = "Р’С‹СЂРµР·Р°С‚СЊ";
+	private final static String SELECTALLTEXT = "Р’С‹Р±СЂР°С‚СЊ РІСЃС‘";
+	private final static String COPYTEXT = "РЎРєРѕРїРёСЂРѕРІР°С‚СЊ";
+	private final static String PASTETEXT = "Р’СЃС‚Р°РІРёС‚СЊ";
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
@@ -86,4 +84,3 @@ public class ContextMenuMouseListener extends MouseAdapter {
 		}
 	}
 }
-

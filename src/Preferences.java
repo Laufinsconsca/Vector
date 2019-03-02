@@ -1,5 +1,3 @@
-package theComputationOfTheRootsOfAnyEquation;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -40,7 +38,7 @@ class Preferences extends JFrame implements ActionListener, WindowListener {
 			}
 		} catch (final Exception e) {
 		}
-		setTitle("Настройки");
+		setTitle("РќР°СЃС‚СЂРѕР№РєРё");
 		setSize(300, 400);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		contentPane = new JPanel();
@@ -62,7 +60,7 @@ class Preferences extends JFrame implements ActionListener, WindowListener {
 		verticalBox.setPreferredSize(new Dimension(0, 15));
 		panel_1.add(verticalBox, BorderLayout.CENTER);
 
-		final JLabel label_ACCURACY_ROUND = new JLabel("Точность");
+		final JLabel label_ACCURACY_ROUND = new JLabel("РўРѕС‡РЅРѕСЃС‚СЊ");
 		label_ACCURACY_ROUND.setAlignmentX(Component.CENTER_ALIGNMENT);
 		label_ACCURACY_ROUND.setVerticalTextPosition(SwingConstants.TOP);
 		label_ACCURACY_ROUND.setVerticalAlignment(SwingConstants.TOP);
@@ -85,8 +83,8 @@ class Preferences extends JFrame implements ActionListener, WindowListener {
 		}
 		Interface.slider.setLabelTable(labelTable);
 		Interface.slider.setPaintLabels(true);
-		Interface.slider.setToolTipText("Точность");
-		Interface.slider.setName("Точность");
+		Interface.slider.setToolTipText("РўРѕС‡РЅРѕСЃС‚СЊ");
+		Interface.slider.setName("РўРѕС‡РЅРѕСЃС‚СЊ");
 		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		panel.add(Interface.slider);
 
@@ -100,7 +98,7 @@ class Preferences extends JFrame implements ActionListener, WindowListener {
 		contentPane.add(panel_2);
 		panel_2.setLayout(new BoxLayout(panel_2, BoxLayout.Y_AXIS));
 		
-		final JLabel lblNewLabel_2 = new JLabel("Представление числа");
+		final JLabel lblNewLabel_2 = new JLabel("РџСЂРµРґСЃС‚Р°РІР»РµРЅРёРµ С‡РёСЃР»Р°");
 		lblNewLabel_2.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		lblNewLabel_2.setVerticalTextPosition(SwingConstants.TOP);
 		lblNewLabel_2.setVerticalAlignment(SwingConstants.TOP);
@@ -129,7 +127,7 @@ class Preferences extends JFrame implements ActionListener, WindowListener {
 		Interface.radioButton_Normal.addActionListener(this);
 		Interface.radioButton_Exponential.addActionListener(this);
 
-		final ChangeListener instantСhange = new ChangeListener() { // мгновенное изменение показаний при изменении в настройках
+		final ChangeListener instantChange = new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent event) {
 				if (event.getSource() == Interface.slider | event.getSource() == Interface.radioButton_Normal
@@ -138,9 +136,9 @@ class Preferences extends JFrame implements ActionListener, WindowListener {
 				}
 			}
 		};
-		Interface.slider.addChangeListener(instantСhange);
-		Interface.radioButton_Normal.addChangeListener(instantСhange);
-		Interface.radioButton_Exponential.addChangeListener(instantСhange);
+		Interface.slider.addChangeListener(instantChange);
+		Interface.radioButton_Normal.addChangeListener(instantChange);
+		Interface.radioButton_Exponential.addChangeListener(instantChange);
 
 		setLocationRelativeTo(null);
 		setResizable(false);
