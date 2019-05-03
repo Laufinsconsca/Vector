@@ -1,6 +1,6 @@
 public class FormationOfSolution {
 	
-	private String textPNG, solutionDescription;
+	private String solutionDescriptionForLaTeX, solutionDescriptionForHTML;
 	String[] roots = new String[4];
 	String[][] coefficientsString = new String[5][2];
 	
@@ -27,10 +27,10 @@ public class FormationOfSolution {
 	
 	public String getContent(boolean isSimpleExponentialView) {
 		if (isSimpleExponentialView) {
-			return solutionDescription;
+			return solutionDescriptionForHTML;
 		}
 		else {
-			return textPNG;
+			return solutionDescriptionForLaTeX;
 		}
 	}
 	
@@ -78,10 +78,10 @@ public class FormationOfSolution {
 	
 	private void setText(String text1, String text2) {
 		if (isSimpleExponentialView) {
-			solutionDescription = (solutionDescription==null?"":solutionDescription) + text1;
+			solutionDescriptionForHTML = (solutionDescriptionForHTML==null?"":solutionDescriptionForHTML) + text1;
 		}
 		else {
-			textPNG = (textPNG==null?"":textPNG) + text2;
+			solutionDescriptionForLaTeX = (solutionDescriptionForLaTeX==null?"":solutionDescriptionForLaTeX) + text2;
 		}
 	}
 	

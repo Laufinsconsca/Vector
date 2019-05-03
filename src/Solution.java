@@ -42,9 +42,9 @@ public class Solution extends JFrame implements ActionListener, WindowListener, 
 	JButton htmlButton, saveButton;
 	int k;
 
-	public Solution(String solutionDescription, int k) {
+	public Solution(int k) {
 		this.k = k;
-		final TeXFormula formula = new TeXFormula(solutionDescription);
+		final TeXFormula formula = new TeXFormula(Interface.getContent(false));
 		final Icon icon = formula.createTeXIcon(TeXConstants.STYLE_DISPLAY, 25);
 		image = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
 		final Graphics2D g = image.createGraphics();

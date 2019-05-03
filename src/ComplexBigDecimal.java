@@ -239,6 +239,12 @@ public class ComplexBigDecimal {
 		return imag.compareTo(BigDecimal.ZERO);
 	} 
 	
+	/**
+	 * Возведение числа z в степень n
+	 * @param n степень
+	 * @return <html>z<font size= 4><sup><small>n</small></sup> </html>
+	 */
+	
 	public ComplexBigDecimal pow(int n) {
 		ComplexBigDecimal result = new ComplexBigDecimal(this.real, this.imag);
 		for (int i = 1; i < n; i++) {
@@ -246,6 +252,12 @@ public class ComplexBigDecimal {
 		}
 		return result;
 	}
+	
+	/**
+	 * Извлечение всех корней степени n из числа z
+	 * @param n степень корня
+	 * @return <html>n комплексных корней вида<font size= 5><sup><small>n</small></sup>&#8730|x|*(cos((arg(x) + 2*&#960*k)/n) + i * sin((arg(x) + 2*&#960*k)/n))</html>
+	 */
 	
 	public ComplexBigDecimal[] root(int n, int accuracyCalculation) {
 		ComplexBigDecimal[] output = new ComplexBigDecimal[n];

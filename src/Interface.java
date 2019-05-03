@@ -403,7 +403,7 @@ public class Interface extends JFrame {
 	private void focus() {
 		final int x = this.getWidth();
 		final int y = this.getHeight();
-		setSize(x + 1, y + 1);
+		setSize(x + 1, y);
 		setSize(x, y);
 	}
 
@@ -494,7 +494,7 @@ public class Interface extends JFrame {
 			public void run() {
 				try {
 					JFrame.setDefaultLookAndFeelDecorated(true);
-					final Solution solution = new Solution(getContent(false), k);
+					final Solution solution = new Solution(k);
 					solution.setVisible(true);
 				} catch (final Exception e) {
 					e.printStackTrace();
