@@ -22,10 +22,13 @@ import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.JTextField;
+import javax.swing.JButton;
 
 class Preferences extends JFrame implements ActionListener, WindowListener {
 	private static final long serialVersionUID = 1L;
 	private final JPanel contentPane;
+	JButton button;
 
 	@SuppressWarnings("unused")
 	public Preferences() {
@@ -78,7 +81,7 @@ class Preferences extends JFrame implements ActionListener, WindowListener {
 		Interface.slider.setPaintTicks(true);
 		Interface.slider.setMinorTickSpacing(Main.SLIDER_MIN_VALUE);
 		final Hashtable<Integer, JLabel> labelTable = new Hashtable<>();
-		for (int i = 2; i < Main.SLIDER_MAX_VALUE+1; i = Main.SLIDER_MAX_VALUE < 24 ?i+2:Main.SLIDER_MAX_VALUE < 48?i+4:Main.SLIDER_MAX_VALUE < 96?i+8:i+16) {
+		for (int i = 2; i < Main.SLIDER_MAX_VALUE+1; i = Main.SLIDER_MAX_VALUE < 24 ?i+2:Main.SLIDER_MAX_VALUE < 48?i+4:Main.SLIDER_MAX_VALUE < 96?i+8:Main.SLIDER_MAX_VALUE < 192?i+16:i+32) {
 			labelTable.put(new Integer(i), new JLabel("" + i));
 		}
 		Interface.slider.setLabelTable(labelTable);
@@ -119,6 +122,63 @@ class Preferences extends JFrame implements ActionListener, WindowListener {
 		
 		Interface.radioButton_Exponential.setBackground(SystemColor.activeCaption);
 		panel_3.add(Interface.radioButton_Exponential);
+		
+		JPanel panel_4 = new JPanel();
+		panel_4.setBackground(SystemColor.activeCaption);
+		panel_2.add(panel_4);
+		panel_4.setPreferredSize(new Dimension(100, 0));
+		panel_4.setLayout(new BoxLayout(panel_4, BoxLayout.Y_AXIS));
+		
+		Box verticalBox_3 = Box.createVerticalBox();
+		verticalBox_3.setPreferredSize(new Dimension(0, 50));
+		panel_4.add(verticalBox_3);
+		
+		JPanel panel_5 = new JPanel();
+		panel_5.setBackground(SystemColor.activeCaption);
+		panel_4.add(panel_5);
+		panel_5.setPreferredSize(new Dimension(0, 30));
+		panel_5.setLayout(new BoxLayout(panel_5, BoxLayout.X_AXIS));
+		
+		Box horizontalBox = Box.createHorizontalBox();
+		horizontalBox.setPreferredSize(new Dimension(50, 0));
+		panel_5.add(horizontalBox);
+		
+		Interface.preferencesTextField = new JTextField();
+		panel_5.add(Interface.preferencesTextField);
+		Interface.preferencesTextField.setPreferredSize(new Dimension(80, 0));
+		Interface.preferencesTextField.setColumns(10);
+		
+		Box horizontalBox_2 = Box.createHorizontalBox();
+		horizontalBox_2.setPreferredSize(new Dimension(30, 0));
+		panel_5.add(horizontalBox_2);
+		
+		button = new JButton("Изменить");
+		panel_5.add(button);
+		button.setPreferredSize(new Dimension(100, 0));
+		button.setAlignmentX(Component.CENTER_ALIGNMENT);
+		
+		Box horizontalBox_1 = Box.createHorizontalBox();
+		horizontalBox_1.setPreferredSize(new Dimension(50, 0));
+		panel_5.add(horizontalBox_1);
+		
+		Box verticalBox_5 = Box.createVerticalBox();
+		verticalBox_5.setPreferredSize(new Dimension(0, 10));
+		panel_4.add(verticalBox_5);
+		
+		JLabel lblNewLabel = new JLabel("Задать точность вручную");
+		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 20));
+		lblNewLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+		panel_4.add(lblNewLabel);
+		
+		JLabel lblNewLabel_1 = new JLabel("max - " + Main.ACCURACY_ROUND);
+		lblNewLabel_1.setFont(new Font("Tahoma", Font.PLAIN, 20));
+		lblNewLabel_1.setAlignmentX(Component.CENTER_ALIGNMENT);
+		panel_4.add(lblNewLabel_1);
+		
+		Box verticalBox_4 = Box.createVerticalBox();
+		verticalBox_4.setPreferredSize(new Dimension(0, 10));
+		panel_4.add(verticalBox_4);
+		
 		Interface.radioButton_Exponential.setVerticalAlignment(SwingConstants.TOP);
 		Interface.radioButton_Exponential.setVerticalTextPosition(SwingConstants.TOP);
 		Interface.radioButton_Exponential.setHorizontalAlignment(SwingConstants.CENTER);
@@ -126,12 +186,17 @@ class Preferences extends JFrame implements ActionListener, WindowListener {
 
 		Interface.radioButton_Normal.addActionListener(this);
 		Interface.radioButton_Exponential.addActionListener(this);
+		button.addActionListener(this);
 
 		final ChangeListener instantChange = new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent event) {
+				if (event.getSource() == Interface.slider) {
+					Interface.sliderValue = Interface.slider.getValue();
+					Interface.preferencesTextField.setText(Interface.slider.getValue() + "");
+				}
 				if (event.getSource() == Interface.slider | event.getSource() == Interface.radioButton_Normal
-						| event.getSource() == Interface.radioButton_Exponential) {
+						| event.getSource() == Interface.radioButton_Exponential | event.getSource() == button) {
 					Interface.output(Interface.calculation.setOutputValuesIfCalculationTrue());
 				}
 			}
@@ -139,6 +204,7 @@ class Preferences extends JFrame implements ActionListener, WindowListener {
 		Interface.slider.addChangeListener(instantChange);
 		Interface.radioButton_Normal.addChangeListener(instantChange);
 		Interface.radioButton_Exponential.addChangeListener(instantChange);
+		button.addChangeListener(instantChange);
 
 		setLocationRelativeTo(null);
 		setResizable(false);
@@ -164,6 +230,9 @@ class Preferences extends JFrame implements ActionListener, WindowListener {
 				Interface.radioButton_Exponential.setSelected(true);
 			}
 			Interface.isNormalView = false;
+		}
+		if (e.getSource() == button) {
+			Interface.sliderValue = Integer.valueOf(Interface.preferencesTextField.getText());
 		}
 	}
 

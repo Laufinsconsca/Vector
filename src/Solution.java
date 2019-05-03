@@ -38,15 +38,13 @@ import javax.swing.Box;
 public class Solution extends JFrame implements ActionListener, WindowListener, ClipboardOwner {
 	private static final long serialVersionUID = 1L;
 	File file;
-	String solutionDescription;
 	BufferedImage image;
-	JButton bufferButton, saveButton;
+	JButton htmlButton, saveButton;
 	int k;
 
-	public Solution(String solutionDescription, String textPNG, int k) {
+	public Solution(String solutionDescription, int k) {
 		this.k = k;
-		this.solutionDescription = solutionDescription;
-		final TeXFormula formula = new TeXFormula(textPNG);
+		final TeXFormula formula = new TeXFormula(solutionDescription);
 		final Icon icon = formula.createTeXIcon(TeXConstants.STYLE_DISPLAY, 25);
 		image = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
 		final Graphics2D g = image.createGraphics();
@@ -90,14 +88,14 @@ public class Solution extends JFrame implements ActionListener, WindowListener, 
 		gbc_horizontalGlue_1.gridy = 1;
 		panel.add(horizontalGlue_1, gbc_horizontalGlue_1);
 		
-		bufferButton = new JButton("Копировать в HTML");
+		htmlButton = new JButton("Копировать в HTML");
 		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
 		gbc_btnNewButton.fill = GridBagConstraints.HORIZONTAL;
 		gbc_btnNewButton.insets = new Insets(0, 0, 0, 5);
 		gbc_btnNewButton.gridx = 1;
 		gbc_btnNewButton.gridy = 1;
-		panel.add(bufferButton, gbc_btnNewButton);
-		bufferButton.addActionListener(this);
+		panel.add(htmlButton, gbc_btnNewButton);
+		htmlButton.addActionListener(this);
 		
 		Component horizontalGlue = Box.createHorizontalGlue();
 		GridBagConstraints gbc_horizontalGlue = new GridBagConstraints();
@@ -162,8 +160,8 @@ public class Solution extends JFrame implements ActionListener, WindowListener, 
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() == bufferButton) {
-			final StringSelection stringSelection = new StringSelection(solutionDescription);
+		if (e.getSource() == htmlButton) {
+			final StringSelection stringSelection = new StringSelection(Interface.getContent(true));
 			final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 			clipboard.setContents(stringSelection, this);
 		}

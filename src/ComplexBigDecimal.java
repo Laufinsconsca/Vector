@@ -237,7 +237,7 @@ public class ComplexBigDecimal {
 	
 	public int compareImagToZero() {
 		return imag.compareTo(BigDecimal.ZERO);
-	}
+	} 
 	
 	public ComplexBigDecimal pow(int n) {
 		ComplexBigDecimal result = new ComplexBigDecimal(this.real, this.imag);
@@ -249,7 +249,7 @@ public class ComplexBigDecimal {
 	
 	public ComplexBigDecimal[] root(int n, int accuracyCalculation) {
 		ComplexBigDecimal[] output = new ComplexBigDecimal[n];
-		final Apcomplex input = new Apcomplex(new Apfloat(real, Main.ACCURACY_CALCULATION+400), new Apfloat(imag, Main.ACCURACY_CALCULATION+400));
+		final Apcomplex input = new Apcomplex(new Apfloat(real, Main.ACCURACY_CALCULATION), new Apfloat(imag, Main.ACCURACY_CALCULATION));
 		for (int i = 0; i < n; i++) {
 			output[i] = new ComplexBigDecimal();
 			output[i].setReal(new BigDecimal(ApcomplexMath.allRoots(input, n)[i].real().toString()).setScale(accuracyCalculation, BigDecimal.ROUND_CEILING));

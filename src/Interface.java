@@ -40,20 +40,26 @@ import javax.swing.text.JTextComponent;
 public class Interface extends JFrame {
 
 	private static final long serialVersionUID = 1L;
+	public static Object content;
 	private int k = 0;
+	public static int sliderValue = 10;
 	private JPanel contentPane;
 	JPanel panel, panel_2;
 	JScrollPane scrollPane;
 	JLabel labelInfo, labelGlue, label_solution;
 	public static JSlider slider;
 	public static JRadioButton radioButton_Normal, radioButton_Exponential;
+	public static JTextField preferencesTextField = new JTextField();
 	public static JComboBox<Object> box = new JComboBox<>();
 	private KeyListener[] textFilter = new KeyListener[5];
 	private JLabel[] label = new JLabel[9];
 	private static JTextField[] textField = new JTextField[9];
 	private JButton calculationButton, resetButton, aboutButton, solutionButton, preferencesButton;
 	private String[] labelText = { "Коэф. A", "Коэф. B", "Коэф. C", "Коэф. D", "Коэф. E", "x1 =", "x2 =", "x3 =", "x4 =" };
-	private String[] labelInfoText = { "<html><font size=5>Общий вид уравнения: Ax + B = 0", "<html><font size=5>Общий вид уравнения: Ax&sup2 + Bx + C = 0", "<html><font size=5>Общий вид уравнения: Ax&sup3 + Bx&sup2 + Cx + D = 0", "<html><font size=5>вид уравнения: Ax<font size = 3><sup><small>4</sup><small></font>" + "<html><font size=5> + Bx&sup3 + Cx&sup2 + Dx + E = 0" };
+	private String[] labelInfoText = { "<html><font size=5>Общий вид уравнения: Ax + B = 0", "<html><font size=5>"
+			+ "Общий вид уравнения: Ax&sup2 + Bx + C = 0", "<html><font size=5>Общий вид уравнения: Ax&sup3 + "
+			+ "Bx&sup2 + Cx + D = 0", "<html><font size=5>вид уравнения: Ax<font size = 3><sup><small>4</sup>"
+			+ "<small></font>" + "<html><font size=5> + Bx&sup3 + Cx&sup2 + Dx + E = 0" };
 	Component horizontalGlue = Box.createHorizontalGlue();
 	Component horizontalGlue_1 = Box.createHorizontalGlue();
 	public static boolean isNormalView = true, openPreferences;
@@ -63,7 +69,7 @@ public class Interface extends JFrame {
 	private static boolean IS_QUADRATIC_EQUATION;
 	private static boolean IS_LINEAR_EQUATION;
 	public static Calculation calculation = new Calculation();
-	private FormationOfSolution formation = new FormationOfSolution();
+	public static FormationOfSolution formation = new FormationOfSolution();
 	public Interface() {
 		super("Vector");
 		createGUI();
@@ -82,7 +88,7 @@ public class Interface extends JFrame {
 		slider = new JSlider();
 		slider.setMaximum(Main.SLIDER_MAX_VALUE);
 		slider.setMinimum(Main.SLIDER_MIN_VALUE);
-		slider.setValue(24);
+		slider.setValue(10);
 		radioButton_Normal = new JRadioButton("Обычный");
 		radioButton_Normal.setSelected(true);
 		radioButton_Exponential = new JRadioButton("Экспоненциальный");
@@ -354,7 +360,7 @@ public class Interface extends JFrame {
 				isEmptyTextField[i] = isEmpty(textField[i]);
 			}
 			if (event.getSource() == calculationButton) {
-				processingCalculationsOrSolutions(true, textField, isEmptyTextField);
+				processingCalculationsOrSolutions(true, textField, isEmptyTextField);	
 			}
 			if (event.getSource() == solutionButton) {
 				processingCalculationsOrSolutions(false, textField, isEmptyTextField);
@@ -467,31 +473,39 @@ public class Interface extends JFrame {
 		}
 	}
 	
+	private static void formation_of_solution(boolean isSimpleExponentialView) {
+		if (IS_LINEAR_EQUATION) {
+			formation = new FormationOfSolution(isSimpleExponentialView, null, null, null, textField[0].getText(), textField[1].getText());
+			}
+			if (IS_QUADRATIC_EQUATION) {
+			formation = new FormationOfSolution(isSimpleExponentialView, null, null, textField[0].getText(), textField[1].getText(), textField[2].getText());
+			}
+			if (IS_CUBIC_EQUATION) {
+			formation = new FormationOfSolution(isSimpleExponentialView, null, textField[0].getText(), textField[1].getText(), textField[2].getText(), textField[3].getText());
+			}
+			if (IS_EQUATION_OF_FOURTH_POW) {
+			formation = new FormationOfSolution(isSimpleExponentialView, textField[0].getText(), textField[1].getText(), textField[2].getText(), textField[3].getText(), textField[4].getText());
+			}
+	}
+	
 	private void solution() {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
 				try {
 					JFrame.setDefaultLookAndFeelDecorated(true);
-						if (IS_LINEAR_EQUATION) {
-						formation = new FormationOfSolution(null, null, null, textField[0].getText(), textField[1].getText());
-						}
-						if (IS_QUADRATIC_EQUATION) {
-						formation = new FormationOfSolution(null, null, textField[0].getText(), textField[1].getText(), textField[2].getText());
-						}
-						if (IS_CUBIC_EQUATION) {
-						formation = new FormationOfSolution(null, textField[0].getText(), textField[1].getText(), textField[2].getText(), textField[3].getText());
-						}
-						if (IS_EQUATION_OF_FOURTH_POW) {
-						formation = new FormationOfSolution(textField[0].getText(), textField[1].getText(), textField[2].getText(), textField[3].getText(), textField[4].getText());
-						}
-					final Solution solution = new Solution(formation.getSolutionDescription(), formation.getTextPNG(), k);
+					final Solution solution = new Solution(getContent(false), k);
 					solution.setVisible(true);
 				} catch (final Exception e) {
 					e.printStackTrace();
 				}
 			}
 		});
+	}
+	
+	public static String getContent(boolean isSimpleExponentialView) {
+		formation_of_solution(isSimpleExponentialView);
+		return formation.getContent(isSimpleExponentialView);
 	}
 	
 	private void setLineEquation() {
