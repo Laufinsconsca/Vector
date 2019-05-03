@@ -45,7 +45,7 @@ public class Calculation {
 	public Calculation setOutputValuesIfCalculationTrue() {
 		for (int i = 0; i < 4; i++) {
 			if (output[i] != null) {
-			roots[i] = output[i].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.slider.getValue());	
+			roots[i] = output[i].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.sliderValue);	
 			}
 		}
 		return this;
@@ -57,9 +57,9 @@ public class Calculation {
 				if (coefficients[2].isEqualToZero()) {
 					if (coefficients[3].isEqualToZero()) {
 						if (coefficients[4].isEqualToZero()) {
-							roots[0] = "x принадлежит множеству всех действительных чисел";
-						} else {
 							roots[0] = "x принадлежит множеству всех комплексных чисел";
+						} else {
+							roots[0] = "x не существует";
 							}
 					} else {
 						if (coefficients[4].isEqualToZero()) {
@@ -177,7 +177,7 @@ public class Calculation {
 	
 	private void linear_equation(ComplexBigDecimal a, ComplexBigDecimal b, boolean zero) {
 		output[0] = b.negate().divide(a, Main.ACCURACY_ROUND);
-		roots[0] = "" + output[0].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.slider.getValue());
+		roots[0] = "" + output[0].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.sliderValue);
 		roots[1] = zero ? "0" : "";
 	}
 	
@@ -186,21 +186,21 @@ public class Calculation {
 		final ComplexBigDecimal D_root = D.root(2, Main.ACCURACY_CALCULATION)[0];
 		output[0] = D_root.subtract(b).divide(a.multiply(TWO), Main.ACCURACY_CALCULATION);
 		output[1] = D_root.negate().subtract(b).divide(a.multiply(TWO), Main.ACCURACY_CALCULATION);
-		roots[0] = output[0].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.slider.getValue());
+		roots[0] = output[0].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.sliderValue);
 	if (D.isEqualToZero()) {
 		roots[1] = zero?"0":"";
 		}
 	else {
-		roots[1] = output[1].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.slider.getValue());
+		roots[1] = output[1].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.sliderValue);
 		roots[2] = zero?"0":"";
 	}
 	}
 
 	private void incomplete_quadratic_equation(ComplexBigDecimal a, ComplexBigDecimal c, boolean zero) {
 		output[0] = c.negate().divide(a, Main.ACCURACY_CALCULATION).root(2, Main.ACCURACY_CALCULATION)[0];
-		roots[0] = output[0].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.slider.getValue());
+		roots[0] = output[0].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.sliderValue);
 		output[1] = c.negate().divide(a, Main.ACCURACY_CALCULATION).root(2, Main.ACCURACY_CALCULATION)[1];
-		roots[1] = output[1].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.slider.getValue());
+		roots[1] = output[1].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.sliderValue);
 		if (zero) {
 		roots[2] = "0";
 		}
@@ -209,12 +209,12 @@ public class Calculation {
 	private void incomplete_cubic_equation(ComplexBigDecimal a, ComplexBigDecimal b, boolean zero) {
 		final ComplexBigDecimal x = b.negate().divide(a, Main.ACCURACY_CALCULATION);
 		output[0] = x.root(3, Main.ACCURACY_CALCULATION)[0];
-		roots[0] = output[0].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.slider.getValue());
+		roots[0] = output[0].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.sliderValue);
 		if (!output[0].isEqualImagToZero()) {
 			output[1] = b.negate().divide(a, Main.ACCURACY_CALCULATION).root(3, Main.ACCURACY_CALCULATION)[1];
-			roots[1] = output[1].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.slider.getValue());
+			roots[1] = output[1].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.sliderValue);
 			output[2] = b.negate().divide(a, Main.ACCURACY_CALCULATION).root(3, Main.ACCURACY_CALCULATION)[2];
-			roots[2] = output[2].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.slider.getValue());
+			roots[2] = output[2].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.sliderValue);
 			if (zero) {
 				roots[3] = "0";
 			} else {
@@ -232,7 +232,7 @@ public class Calculation {
 			final ComplexBigDecimal q_in1 = (b.pow(3).multiply(TWO)).subtract(a.multiply(b).multiply(NINE).multiply(c)).add(a.pow(2).multiply(d).multiply(TWENTY_SEVEN));
 			q = q_in1.divide(a.pow(3).multiply(TWENTY_SEVEN), Main.ACCURACY_CALCULATION);
 			Q = (p.pow(3).divide(TWENTY_SEVEN, Main.ACCURACY_CALCULATION)).add(q.pow(2).divide(FOUR, Main.ACCURACY_CALCULATION));
-			α = (q.negate().divide(TWO, Main.ACCURACY_CALCULATION).add(Q.root(2, Main.ACCURACY_CALCULATION)[0])).root(3, Main.ACCURACY_CALCULATION)[1];
+			α = (q.negate().divide(TWO, Main.ACCURACY_CALCULATION).add(Q.root(2, Main.ACCURACY_CALCULATION)[0])).root(3, Main.ACCURACY_CALCULATION)[0];
 			β = new ComplexBigDecimal[3];
 			for (int i = 0; i < 3; i ++) {
 				β[i] = new ComplexBigDecimal();
@@ -268,7 +268,7 @@ public class Calculation {
 			}
 			for (int i = 0; i < 3; i++) {
 			output[i] = Y[i].subtract(b.divide(a.multiply(THREE), Main.ACCURACY_CALCULATION));
-			roots[i] = output[i].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.slider.getValue());
+			roots[i] = output[i].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.sliderValue);
 			}
 		if (zero) {
 		roots[3] = "0";
@@ -278,7 +278,7 @@ public class Calculation {
 	private void incomplete_equation_of_fourth_pow(ComplexBigDecimal e, ComplexBigDecimal c) {
 		final ComplexBigDecimal x = c.negate().divide(e, Main.ACCURACY_CALCULATION);
 		output[0] = x.root(4, Main.ACCURACY_CALCULATION)[0];
-		roots[0] = output[0].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.slider.getValue());
+		roots[0] = output[0].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.sliderValue);
 		if (x.root(4, Main.ACCURACY_CALCULATION)[0].isEqualTo(x.root(4, Main.ACCURACY_CALCULATION)[1])) {
 			roots[1] = "";
 			roots[2] = "";
@@ -286,7 +286,7 @@ public class Calculation {
 		} else {
 			for (int i = 1; i < 4; i++) {
 			output[i] = x.root(4, Main.ACCURACY_CALCULATION)[i];
-			roots[i] = output[i].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.slider.getValue());
+			roots[i] = output[i].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.sliderValue);
 			}
 		}
 	}
@@ -315,10 +315,10 @@ public class Calculation {
 			output[1] = prefix.subtract(postfix_x12);
 			output[2] = prefix.add(postfix_x34);
 			output[3] = prefix.subtract(postfix_x34);
-			roots[0] = output[0].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.slider.getValue());
-			roots[1] = output[1].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.slider.getValue());
-			roots[2] = output[2].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.slider.getValue());
-			roots[3] = output[3].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.slider.getValue());
+			roots[0] = output[0].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.sliderValue);
+			roots[1] = output[1].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.sliderValue);
+			roots[2] = output[2].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.sliderValue);
+			roots[3] = output[3].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.sliderValue);
 		} else {
 			p = α.pow(2).negate().divide(TWELVE, Main.ACCURACY_ROUND).subtract(γ);
 			final ComplexBigDecimal Q_in1 = α.pow(3).divide(ONE_HUNDRED_EIGHT, Main.ACCURACY_ROUND);
@@ -349,10 +349,10 @@ public class Calculation {
 					.add(x_in2.divide(TWO, Main.ACCURACY_ROUND));
 			output[3] = prefix.subtract(W.divide(TWO, Main.ACCURACY_ROUND))
 					.subtract(x_in2.divide(TWO, Main.ACCURACY_ROUND));
-			roots[0] = output[0].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.slider.getValue());
-			roots[1] = output[1].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.slider.getValue());
-			roots[2] = output[2].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.slider.getValue());
-			roots[3] = output[3].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.slider.getValue());
+			roots[0] = output[0].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.sliderValue);
+			roots[1] = output[1].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.sliderValue);
+			roots[2] = output[2].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.sliderValue);
+			roots[3] = output[3].formattedString(true, Interface.isNormalView, true, Main.ACCURACY_ROUND, Interface.sliderValue);
 		}
 	}
 	
