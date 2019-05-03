@@ -1,9 +1,6 @@
-import javax.swing.JLabel;
-
 public class FormationOfSolution {
 	
-	private String textPNG;
-	JLabel solutionDescription;
+	private String textPNG, solutionDescription;
 	String[] roots = new String[4];
 	String[][] coefficientsString = new String[5][2];
 	
@@ -14,58 +11,62 @@ public class FormationOfSolution {
 
 	boolean forwardIsNotEmpty;
 	boolean isOutput;
+	boolean isSimpleExponentialView;
 	
 	public FormationOfSolution() {}
 	
-	public FormationOfSolution(String... coefficientsString) {
+	public FormationOfSolution(boolean isSimpleExponentialView, String... coefficientsString) {
 		for (int i = 0; i < 5; i++) {
 			coefficients[i] = new ComplexBigDecimal(coefficientsString[i]);
 			}
-		setIsLatexExponentialView();
-		inputCoefficientsForSolution();
+		this.isSimpleExponentialView = isSimpleExponentialView;
+		setIsExponentialViewForRoots(isSimpleExponentialView);
+		inputCoefficientsForSolution(isSimpleExponentialView);
 		calculation();
 	}
 	
-	public void setIsLatexExponentialView() {
+	public String getContent(boolean isSimpleExponentialView) {
+		if (isSimpleExponentialView) {
+			return solutionDescription;
+		}
+		else {
+			return textPNG;
+		}
+	}
+	
+	public void setIsExponentialViewForRoots(boolean isSimpleExponentialView) {
 		for (int i = 0; i < 4; i++) {
 			if (Interface.calculation.getOutput()[i] != null) {
-			roots[i] = Interface.calculation.getOutput()[i].formattedString(true, Interface.isNormalView, false, Main.ACCURACY_ROUND, Interface.slider.getValue());	
+			roots[i] = Interface.calculation.getOutput()[i].formattedString(true, Interface.isNormalView, isSimpleExponentialView, Main.ACCURACY_ROUND, Interface.sliderValue);	
 			}
 		}
 	}
 	
-	private String output(ComplexBigDecimal a) {
-		String s = a.formattedString(isOutput, Interface.isNormalView, false, Main.ACCURACY_ROUND, Interface.slider.getValue());
+	private String output(ComplexBigDecimal a, boolean isSimpleExponentialView) {
+		String s = a.formattedString(isOutput, Interface.isNormalView, isSimpleExponentialView, Main.ACCURACY_ROUND, Interface.sliderValue);
 		return s;
 	}
 	
-	public String getTextPNG() {
-		return textPNG;
-	}
-	
-	public String getSolutionDescription() {
-		return solutionDescription.getText();
-	}
-	
-	public void inputCoefficientsForSolution() {
+	public void inputCoefficientsForSolution(boolean isSimpleExponentialView) {
 		isOutput = false;
 		for (int i = 0; i < 5; i++) {
 			coefficientsRealNegate[i] = new ComplexBigDecimal(coefficients[i].getReal().negate(), coefficients[i].getImag());
 			coefficientsImagNegate[i] = new ComplexBigDecimal(coefficients[i].getReal(), coefficients[i].getImag().negate());
 			if (!coefficients[i].isEqualToZero()) {
-			coefficientsString[i][0] = coefficients[i].isNotEqualToZero() ? (forwardIsNotEmpty ? " + " : "") + "(" + output(coefficients[i]) + ")"
+			final String output_coefficient = output(coefficients[i], isSimpleExponentialView);
+			coefficientsString[i][0] = coefficients[i].isNotEqualToZero() ? (forwardIsNotEmpty ? " + " : "") + "(" + output_coefficient + ")"
 							: coefficients[i].isEqualImagToZero() ?
 									coefficients[i].compareRealToZero() > 0
 									? (forwardIsNotEmpty ? " + "
 											: "")
-											+ output(coefficients[i])
+											+ output_coefficient
 											: (forwardIsNotEmpty ? " - " : "")
-											+ (forwardIsNotEmpty ? output(coefficientsRealNegate[i]) : output(coefficients[i]))
+											+ (forwardIsNotEmpty ? output(coefficientsRealNegate[i], isSimpleExponentialView) : output_coefficient)
 							: coefficients[i].compareImagToZero() > 0
-											? (forwardIsNotEmpty ? " + " : "") + output(coefficients[i])
-											: (forwardIsNotEmpty ? " - " : "") + (forwardIsNotEmpty ? output(coefficientsImagNegate[i]) : output(coefficients[i])) + "<html>  * x<sup><small>2</small></sup>";
+											? (forwardIsNotEmpty ? " + " : "") + output_coefficient
+											: (forwardIsNotEmpty ? " - " : "") + (forwardIsNotEmpty ? output(coefficientsImagNegate[i], isSimpleExponentialView) : output_coefficient) + "<html>  * x<sup><small>2</small></sup>";
 			coefficientsString[i][1] = coefficientsString[i][0].split("\\<")[0];
-			forwardIsNotEmpty|= !coefficients[i].isEqualRealToZero() || !coefficients[i].isEqualImagToZero();
+			forwardIsNotEmpty|= !(coefficients[i].isEqualRealToZero() && coefficients[i].isEqualImagToZero());
 			}
 			else {
 			coefficientsString[i][0] = "";
@@ -73,6 +74,15 @@ public class FormationOfSolution {
 			}
 		}
 		isOutput = true;
+	}
+	
+	private void setText(String text1, String text2) {
+		if (isSimpleExponentialView) {
+			solutionDescription = (solutionDescription==null?"":solutionDescription) + text1;
+		}
+		else {
+			textPNG = (textPNG==null?"":textPNG) + text2;
+		}
 	}
 	
 	public void calculation() {
@@ -83,52 +93,51 @@ public class FormationOfSolution {
 					if (coefficients[3].isEqualToZero()) {
 						if (coefficients[4].isEqualToZero()) {
 							if (n == 0) {
-								solutionDescription = new JLabel("<html><font size = 5>Ниже представлено решение линейного уравнения<br>"
+								setText("<html><font size = 5>Ниже представлено решение линейного уравнения<br>"
 										+ "Вид уравнения: Ax + B = 0<br><br>" + "Иcходное уравнение: 0*x + 0 = 0<br><br>"
-										+ "0 * x = 0, =&gt x принадлежит области всех действительных чисел");
-								textPNG = "Ниже \\ представлено \\ решение \\ линейного \\ уравнения: \\\\ Вид \\ уравнения: Ax + B = 0 \\\\"
+										+ "0 * x = 0, =&gt x принадлежит области всех комплексных чисел","Ниже \\ представлено \\ решение \\ линейного \\ уравнения: \\\\ Вид \\ уравнения: Ax + B = 0 \\\\"
 										+ "Иcходное \\ уравнение: " + "0x + 0 = 0" + " \\\\"
-										+ "0 \\ всегда = 0, \\Rightarrow x \\ принадлежит \\ области \\ всех \\ действительных \\ чисел";
+										+ "0 \\ всегда = 0, \\Rightarrow x \\ принадлежит \\ области \\ всех \\ комплексных \\ чисел");
 							}
 							if (n == 1) {
-								solutionDescription = new JLabel("<html><font size = 5>Ниже представлено решение квадратного уравнения<br>"
+								setText("<html><font size = 5>Ниже представлено решение квадратного уравнения<br>"
 										+ "Вид уравнения: Ax&sup2 + Bx + C = 0<br><br>" + "Исходное уравнение: 0*x&sup2 + 0*x + 0 = 0<br><br>"
-										+ "0 * x&sup2 + 0 * x = 0, =&gt x принадлежит области всех действительных чисел");
-								textPNG = "Ниже \\ представлено \\ решение \\ квадратного \\ уравнения: \\\\ Вид \\ уравнения: Ax^2 + Bx + C = 0 \\\\"
+										+ "0 * x&sup2 + 0 * x = 0, =&gt x принадлежит области всех комплексных чисел",
+										"Ниже \\ представлено \\ решение \\ квадратного \\ уравнения: \\\\ Вид \\ уравнения: Ax^2 + Bx + C = 0 \\\\"
 										+ " Иcходное \\ уравнение: " + "0x^2 + 0x + 0 = 0" + "\\\\"
-										+ "0 \\ всегда = 0, \\Rightarrow x \\ принадлежит \\ области \\ всех \\ действительных \\ чисел";
+										+ "0 \\ всегда = 0, \\Rightarrow x \\ принадлежит \\ области \\ всех \\ комплексных \\ чисел");
 							}
 							if (n == 2) {
-								solutionDescription = new JLabel("<html><font size = 5>Ниже представлено решение кубического уравнения<br>"
+								setText("<html><font size = 5>Ниже представлено решение кубического уравнения<br>"
 										+ "Вид уравнения: Ax&sup3 + Bx&sup2 + Cx + D = 0<br><br>" + "Исходное уравнение: 0*x&sup3 + 0*x&sup2 + 0*x + 0 = 0<br><br>"
-										+ "0 * x&sup3 + 0 * x&sup2 + 0 * x = 0, =&gt x принадлежит области всех действительных чисел");
-								textPNG = "Ниже \\ представлено \\ решение \\ кубического \\ уравнения: \\\\ Вид \\ уравнения: Ax^3 + Bx^2 + Cx + D = 0 \\\\"
+										+ "0 * x&sup3 + 0 * x&sup2 + 0 * x = 0, =&gt x принадлежит области всех комплексных чисел",
+										"Ниже \\ представлено \\ решение \\ кубического \\ уравнения: \\\\ Вид \\ уравнения: Ax^3 + Bx^2 + Cx + D = 0 \\\\"
 										+ " Иcходное \\ уравнение: " + "0x^3 + 0x^2 + 0x + 0 = 0" + "\\\\"
-										+ "0 \\ всегда = 0, \\Rightarrow x \\ принадлежит \\ области \\ всех \\ действительных \\ чисел";
+										+ "0 \\ всегда = 0, \\Rightarrow x \\ принадлежит \\ области \\ всех \\ комплексных \\ чисел");
 							}
 							if (n == 3) {
-								solutionDescription = new JLabel("<html><font size = 5>  Ниже представлено решение уравнения четвертой степени<br>"
+								setText("<html><font size = 5>  Ниже представлено решение уравнения четвертой степени<br>"
 										+ "Вид уравнения: A * x<font size=3><sup>4</sup></font> + B * x<font size=3><sup>3</sup></font> + C * x<font size=3><sup>2</sup></font> + "
 										+ "D * x + E = 0 <br><br>" + "Исходное уравнение: 0*x<font size=3><sup>4</sup></font> + 0*x<font size=3><sup>3</sup></font> + 0*x<font size=3><sup>2</sup></font> + 0*x + 0 = 0<br><br>"
 										+ "0 * x<sup><small><font size = 3>4</font></small></sup>"
-										+ " + 0 * x&sup3 + 0 * x&sup2 + 0 * x = 0, =&gt x принадлежит области всех действительных чисел");
-								textPNG = "Ниже \\ представлено \\ решение \\ уравнения \\ четвертой \\ степени: \\\\ Вид \\ уравнения: Ax^4 + Bx^3 + Cx^2 + Dx + E = 0 \\\\"
+										+ " + 0 * x&sup3 + 0 * x&sup2 + 0 * x = 0, =&gt x принадлежит области всех комплексных чисел",
+										"Ниже \\ представлено \\ решение \\ уравнения \\ четвертой \\ степени: \\\\ Вид \\ уравнения: Ax^4 + Bx^3 + Cx^2 + Dx + E = 0 \\\\"
 										+ " Иcходное \\ уравнение: " + "0x^4 + 0x^3 + 0x^2 + 0x + 0 = 0" + "\\\\"
-										+ "0 \\ всегда = 0, \\Rightarrow x \\ принадлежит \\ области \\ всех \\ действительных \\ чисел";
+										+ "0 \\ всегда = 0, \\Rightarrow x \\ принадлежит \\ области \\ всех \\ комплексных \\ чисел");
 							}
 						} else {
-							solutionDescription = new JLabel(
-									"<html><font size = 5>Число, отличное от нуля, <br>не может быть равно нулю, =&gt x не существует");
-							textPNG = "Число, \\ отличное \\ от \\ нуля, \\ не \\ может \\ быть \\ равно \\ нулю, \\Rightarrow \\\\ x \\ принадлежит \\ множеству \\ всех \\ комплексных \\ чисел";
+							setText("<html><font size = 5>Число, отличное от нуля, <br>не может быть равно нулю, =&gt x не существует",
+									"Число, \\ отличное \\ от \\ нуля, \\ не \\ может \\ быть \\ равно \\ нулю, \\Rightarrow \\\\ x \\ "
+									+ "не \\ существует");
 						}
 					} else {
 						if (coefficients[4].isEqualToZero()) {
-							solutionDescription = new JLabel("<html><font size = 5>Ниже представлено решение линейного уравнения <br><br>"
+							setText("<html><font size = 5>Ниже представлено решение линейного уравнения <br><br>"
 									+ "Вид уравнения: Ax + B = 0 <br><br> Иcходное уравнение: " + coefficientsString[3][1] + "x = 0<br><br>"
-									+ "x = -B/A = 0");
-							textPNG = "Ниже \\ представлено \\ решение \\ линейного \\ уравнения \\ \\\\"
+									+ "x = -B/A = 0",
+									"Ниже \\ представлено \\ решение \\ линейного \\ уравнения \\ \\\\"
 									+ "Вид \\ уравнения: \\ Ax + B = 0 \\\\ Иcходное \\ уравнение: " + coefficientsString[3][1] + "x = 0\\\\"
-									+ "x = -B/A = 0";
+									+ "x = -B/A = 0");
 						} else { 
 						the_solution_of_the_linear_equation();
 						}
@@ -136,26 +145,27 @@ public class FormationOfSolution {
 				} else {
 					if (coefficients[3].isEqualToZero()) {
 						if (coefficients[4].isEqualToZero()) {
-							solutionDescription = new JLabel("<html><font size = 5>Ниже представлено решение квадратного уравнения<br>"
+							setText("<html><font size = 5>Ниже представлено решение квадратного уравнения<br>"
 									+ "Вид уравнения: Ax&sup2 + Bx + C = 0<br><br>" + "Исходное уравнение: "
 									+ coefficientsString[2][0] + "x&sup2 = 0<br><br>" + "<html><font size = 5>  "
-									+ coefficientsString[2][0] + "* x&sup2 = 0, =&gt x = 0");
-							textPNG = "Ниже \\ представлено \\ решение \\ квадратного \\ уравнения: \\\\ Вид \\ уравнения: Ax^2 + Bx + C = 0 \\\\"
+									+ coefficientsString[2][0] + "* x&sup2 = 0, =&gt x = 0",
+									"Ниже \\ представлено \\ решение \\ квадратного \\ уравнения: \\\\ Вид \\ уравнения: Ax^2 + Bx + C = 0 \\\\"
 									+ " Иcходное \\ уравнение: " + coefficientsString[2][1]
-									+ "x^2" + " = 0 \\\\ " + coefficientsString[2][1] + "x^2 = 0, \\Rightarrow x = 0";
+									+ "x^2" + " = 0 \\\\ " + coefficientsString[2][1] + "x^2 = 0, \\Rightarrow x = 0");
 						} else {
-							solutionDescription = new JLabel(
-									"<html><font size = 5>Ниже представлено решение квадратного уравнения<br>"
+							setText("<html><font size = 5>Ниже представлено решение квадратного уравнения<br>"
 									+ "Вид уравнения: Ax&sup2 + Bx + C = 0<br><br>" + "Исходное уравнение: "
 									+ coefficientsString[2][0] + "x&sup2"
-									+ coefficientsString[4][0] + " = 0<br><br>" + "<html><font size = 5>x<sub><small>1,2</small></sub> = &#8730-C/A<br><br> x<sub><small>1</small></sub>= " + roots[0] + "<br><br> x<sub><small>2</small></sub>= " + roots[1]);
-							textPNG = "Ниже \\ представлено \\ решение \\ квадратного \\ уравнения: \\\\ Вид \\ уравнения: Ax^2 + Bx + C = 0 \\\\"
+									+ coefficientsString[4][0] + " = 0<br><br>" + "<html><font size = 5>"
+									+ "x<sub><small>1,2</small></sub> = &#8730-C/A<br><br> x<sub><small>1</small></sub>= " + roots[0] + 
+									"<br><br> x<sub><small>2</small></sub>= " + roots[1],
+									"Ниже \\ представлено \\ решение \\ квадратного \\ уравнения: \\\\ Вид \\ уравнения: Ax^2 + Bx + C = 0 \\\\"
 									+ " Иcходное \\ уравнение: " + coefficientsString[2][1]
-									+ "x^2" + coefficientsString[4][0] + " = 0 \\\\ " + "x_{1,2} = \\sqrt{-\\frac{C}{A}}\\\\x_{1} = " + roots[0] + "\\\\x_{2} = " + roots[1];
+									+ "x^2" + coefficientsString[4][0] + " = 0 \\\\ " + "x_{1,2} = \\sqrt{-\\frac{C}{A}}\\\\x_{1} = " + roots[0] + "\\\\x_{2} = " + roots[1]);
 						}
 					} else {
 						if (coefficients[4].isEqualToZero()) {
-							solutionDescription = new JLabel("<html><font size = 5>Ниже представлено решение квадратного уравнения<br>"
+							setText("<html><font size = 5>Ниже представлено решение квадратного уравнения<br>"
 									+ "Вид уравнения: Ax&sup2 + Bx + C = 0<br><br>" + "Исходное уравнение: "
 									+ coefficientsString[2][0] + "x&sup2"
 									+ coefficientsString[3][0] + "x = 0<br><br>"
@@ -166,8 +176,8 @@ public class FormationOfSolution {
 									+ coefficientsString[3][0] + ")<br><br>"
 									+ "Очевидно, что x<sub><small>1</small></sub> = 0<br><br>"
 									+ "Второй корень находим, решая линейное уравнение <br><br>"
-									+ "x<sub><small>2</small></sub> = -B/A = " + roots[0]);
-							textPNG = "Ниже \\ представлено \\ решение \\ квадратного \\ уравнения: \\\\ Вид \\ уравнения: Ax^2 + Bx + C = 0 \\\\"
+									+ "x<sub><small>2</small></sub> = -B/A = " + roots[0],
+									"Ниже \\ представлено \\ решение \\ квадратного \\ уравнения: \\\\ Вид \\ уравнения: Ax^2 + Bx + C = 0 \\\\"
 									+ " Иcходное \\ уравнение: " + coefficientsString[2][1]
 									+ "x^2" + coefficientsString[3][1] + "x"
 									+ coefficientsString[4][0] + " = 0 \\\\ " + "Сначала \\ выносим \\ x \\ скобки: \\\\ "
@@ -177,7 +187,7 @@ public class FormationOfSolution {
 									+ coefficientsString[3][1] + ")x = 0 \\\\ "
 									+ "Очевидно, \\ что \\ x_{1} = 0 \\\\ "
 									+ "Второй \\ корень \\ находим, \\ решая \\ линейное \\ уравнение: \\\\"
-									+ "x_{2} = -\\frac{B}{A} = " + roots[0];
+									+ "x_{2} = -\\frac{B}{A} = " + roots[0]);
 						} else {
 							the_solution_of_the_quadratic_equation();
 						}
@@ -187,30 +197,30 @@ public class FormationOfSolution {
 				if (coefficients[2].isEqualToZero()) {
 					if (coefficients[3].isEqualToZero()) {
 						if (coefficients[4].isEqualToZero()) {
-							solutionDescription = new JLabel("<html><font size = 5>Ниже представлено решение кубического уравнения<br>"
+							setText("<html><font size = 5>Ниже представлено решение кубического уравнения<br>"
 									+ "Вид уравнения: Ax&sup3 + Bx&sup2 + Cx + D = 0<br><br>" + "Исходное уравнение: "
 									+ coefficientsString[1][0] + "x&sup3 = 0<br><br>" + "<html><font size = 5>  "
-									+ coefficientsString[1][0] + "x^3 = 0, =&gt x = 0");
-							textPNG = "Ниже \\ представлено \\ решение \\ кубического \\ уравнения: \\\\ Вид \\ уравнения: Ax^3 + Bx^2 + Cx + D = 0 \\\\"
+									+ coefficientsString[1][0] + "x^3 = 0, =&gt x = 0",
+									"Ниже \\ представлено \\ решение \\ кубического \\ уравнения: \\\\ Вид \\ уравнения: Ax^3 + Bx^2 + Cx + D = 0 \\\\"
 									+ " Иcходное \\ уравнение: " + coefficientsString[1][1]
-									+ "x^3" + " = 0 \\\\ " + coefficientsString[1][1] + "x^3 = 0, \\Rightarrow x = 0";
+									+ "x^3" + " = 0 \\\\ " + coefficientsString[1][1] + "x^3 = 0, \\Rightarrow x = 0");
 						} else {
-							solutionDescription = new JLabel("<html><font size = 5>Ниже представлено решение кубического уравнения<br>"
+							setText("<html><font size = 5>Ниже представлено решение кубического уравнения<br>"
 									+ "Вид уравнения: Ax&sup3 + Bx&sup2 + Cx + D = 0<br><br>" + "Исходное уравнение: "
 									+ coefficientsString[1][0] + "x&sup3"
 									+ coefficientsString[4][0] + " = 0<br><br>"
 									+ "<html><font size = 5>x = <sup><small>3</small></sup><font size = 7>&#8730</font>-D/A = "
 									+ "x<sub><small>1</small></sub> = " + roots[0] + "<br><br>"
 									+ "x<sub><small>2</small></sub> = " + roots[1] + "<br><br>"
-									+ "x<sub><small>3</small></sub> = " + roots[2]);
-							textPNG = "Ниже \\ представлено \\ решение \\ кубического \\ уравнения: \\\\ Вид \\ уравнения: Ax^3 + Bx^2 + Cx + D = 0 \\\\"
+									+ "x<sub><small>3</small></sub> = " + roots[2],
+									"Ниже \\ представлено \\ решение \\ кубического \\ уравнения: \\\\ Вид \\ уравнения: Ax^3 + Bx^2 + Cx + D = 0 \\\\"
 									+ " Иcходное \\ уравнение: " + coefficientsString[1][1]
 									+ "x^3" + coefficientsString[4][0] + " = 0 \\\\"
-									+ "x = \\sqrt[3]{-\\frac{D}{A}} \\\\x_{1} = " + roots[0] + " \\\\ x_{2} = " + roots[1] + " \\\\ x_{3} = " + roots[2];
+									+ "x = \\sqrt[3]{-\\frac{D}{A}} \\\\x_{1} = " + roots[0] + " \\\\ x_{2} = " + roots[1] + " \\\\ x_{3} = " + roots[2]);
 						}
 					} else {
 						if (coefficients[4].isEqualToZero()) {
-							solutionDescription = new JLabel("<html><font size = 5>Ниже представлено решение кубического уравнения<br>"
+							setText("<html><font size = 5>Ниже представлено решение кубического уравнения<br>"
 									+ "Вид уравнения: Ax&sup3 + Bx&sup2 + Cx + D = 0<br><br>" + "Исходное уравнение: "
 									+ coefficientsString[1][0] + "x&sup3"
 									+ coefficientsString[3][0] + "x = 0<br><br>"
@@ -223,8 +233,8 @@ public class FormationOfSolution {
 									+ "Отсюда видно, что x<sub><small>1</small></sub> = 0<br><br>Остальные корни находим, решая неполное квадратное уравнение: <br><br>"
 									+ "<html>x<sub><small>2,3</small></sub><font size = 5> = &#8730-C/A<br>"
 									+ "x<sub><small>2</small></sub> = " + roots[0]
-									+ "<br>x<sub><small>3</small></sub> = " + roots[1]);
-							textPNG = "Ниже \\ представлено \\ решение \\ неполного \\ кубического \\ уравнения: \\\\ Вид \\ уравнения: Ax^3 + Bx^2 + Cx + D = 0 \\\\"
+									+ "<br>x<sub><small>3</small></sub> = " + roots[1],
+									"Ниже \\ представлено \\ решение \\ неполного \\ кубического \\ уравнения: \\\\ Вид \\ уравнения: Ax^3 + Bx^2 + Cx + D = 0 \\\\"
 									+ " Иcходное \\ уравнение: " + coefficientsString[1][1]
 									+ "x^3" + coefficientsString[3][1] + "x = 0 \\\\ "
 									+ "Сначала \\ выносим \\ x \\ скобки: \\\\"
@@ -236,7 +246,7 @@ public class FormationOfSolution {
 									+ coefficientsString[1][1] + "x^2" + 
 									coefficientsString[3][1] + " = 0 \\\\ "
 									+ "x_{2,3} = \\sqrt{-\\frac{C}{A}} \\\\ "
-									+ "x_{2} = " + roots[0] + " \\\\ x_{3} = " + roots[1];
+									+ "x_{2} = " + roots[0] + " \\\\ x_{3} = " + roots[1]);
 						} else {
 							the_solution_of_the_cubic_equation();
 						}
@@ -244,7 +254,7 @@ public class FormationOfSolution {
 				} else {
 					if (coefficients[2].isEqualToZero()) {
 						if (coefficients[3].isEqualToZero()) {
-							solutionDescription = new JLabel("<html><font size = 5>Ниже представлено решение кубического уравнения<br>"
+							setText("<html><font size = 5>Ниже представлено решение кубического уравнения<br>"
 									+ "Вид уравнения: Ax&sup3 + Bx&sup2 + Cx + D = 0<br><br>" + "Исходное уравнение: "
 									+ coefficientsString[1][0] + "x&sup3"
 									+ coefficientsString[2][0] + "x&sup2 = 0<br><br>"
@@ -257,8 +267,8 @@ public class FormationOfSolution {
 									+ "Второй корень находим, решая линейное уравнение "
 									+ coefficientsString[1][0] + " * x"
 									+ coefficientsString[2][1] + " = 0<br><br>"
-									+ "x<sub><small>2</small></sub> = -B/A = " + roots[0]);
-							textPNG = "Ниже \\ представлено \\ решение \\ кубического \\ уравнения: \\\\ Вид \\ уравнения: Ax^3 + Bx^2 + Cx + D = 0 \\\\"
+									+ "x<sub><small>2</small></sub> = -B/A = " + roots[0],
+									"Ниже \\ представлено \\ решение \\ кубического \\ уравнения: \\\\ Вид \\ уравнения: Ax^3 + Bx^2 + Cx + D = 0 \\\\"
 									+ " Иcходное \\ уравнение: " + coefficientsString[1][1]
 									+ "x^3" + coefficientsString[2][1] + "x^2"
 									+ " = 0 \\\\ Сначала \\ выносим \\ x^2 \\ за \\ скобки: " + coefficientsString[1][1] + "x^3"
@@ -266,13 +276,13 @@ public class FormationOfSolution {
 									+ coefficientsString[2][1] + ")x^2 = 0 \\\\ "
 									+ "Отcюда \\ видно, \\ что \\ x_{1} = 0 \\\\ "
 									+ "Второй \\ корень \\ находим, \\ решая \\ линейное \\ уравнение: \\\\ "
-									+ "x_{2} = -\\frac{B}{A} = " + roots[0];
+									+ "x_{2} = -\\frac{B}{A} = " + roots[0]);
 						} else {
 							the_solution_of_the_cubic_equation();
 						}
 					} else {
 						if (coefficients[4].isEqualToZero()) {	
-							solutionDescription = new JLabel("<html><font size = 5>Ниже представлено решение кубического уравнения: <br><br>Вид уравнения: Ax^3 + Bx^2 + Cx + D = 0 <br><br>"
+							setText("<html><font size = 5>Ниже представлено решение кубического уравнения: <br><br>Вид уравнения: Ax^3 + Bx^2 + Cx + D = 0 <br><br>"
 									+ " Иcходное уравнение: " + coefficientsString[1][1]
 									+ "x^3" + coefficientsString[2][1] + "x^2"
 									+ " = 0 <br><br> Сначала выносим x скобки:<br><br>"
@@ -285,8 +295,8 @@ public class FormationOfSolution {
 									+ "Третий корень находим, решая линейное уравнение "
 									+ coefficientsString[1][0] + " * x"
 									+ coefficientsString[2][1] + " = 0<br><br>"
-									+ "x<sub><small>3</small></sub> = -B/A = " + roots[0]);
-							textPNG = "Ниже \\ представлено \\ решение \\ кубического \\ уравнения: \\\\ Вид \\ уравнения: Ax^3 + Bx^2 + Cx + D = 0 \\\\"
+									+ "x<sub><small>3</small></sub> = -B/A = " + roots[0],
+									"Ниже \\ представлено \\ решение \\ кубического \\ уравнения: \\\\ Вид \\ уравнения: Ax^3 + Bx^2 + Cx + D = 0 \\\\"
 									+ " Иcходное \\ уравнение: " + coefficientsString[1][1]
 									+ "x^3" + coefficientsString[2][1] + "x^2"
 									+ coefficientsString[3][1]
@@ -297,7 +307,7 @@ public class FormationOfSolution {
 									+ coefficientsString[2][1] + coefficientsString[3][1] + ")x = 0 \\\\ "
 									+ "Отcюда \\ видно, \\ что \\ x_{1,2} = 0 \\\\ "
 									+ "Третий \\ корень \\ находим, \\ решая \\ линейное \\ уравнение: \\\\ "
-									+ "x_{3} = -\\frac{B}{A} = " + roots[0];
+									+ "x_{3} = -\\frac{B}{A} = " + roots[0]);
 						} else {
 							the_solution_of_the_cubic_equation();
 						}
@@ -309,33 +319,32 @@ public class FormationOfSolution {
 				if (coefficients[2].isEqualToZero()) {
 					if (coefficients[3].isEqualToZero()) {
 						if (coefficients[4].isEqualToZero()) {
-							solutionDescription = new JLabel(
-									"<html><font size = 5>  Ниже представлено решение уравнения четвертой степени<br>"
+							setText("<html><font size = 5>  Ниже представлено решение уравнения четвертой степени<br>"
 									+ "Вид уравнения: A * x<font size=3><sup>4</sup></font> + B * x<font size=3><sup>3</sup></font> + C * x<font size=3><sup>2</sup></font> + "
 									+ "D * x + E = 0 <br><br>" + "Исходное уравнение: " 
 									+ coefficientsString[0][0] + "x<font size=3><sup>4</sup></font> = 0<html><br><br>" + "<html><font size = 5>  " + coefficientsString[0][0]
-									+ " * x<sup><small>4</small></sup> = 0, =&gt x = 0");
-							textPNG = "Ниже \\ представлено \\ решение \\ уравнения \\ четвертой \\ степени: \\\\ Вид \\ уравнения: Ax^4 + Bx^3 + Cx^2 + Dx + E = 0 \\\\"
+									+ " * x<sup><small>4</small></sup> = 0, =&gt x = 0",
+									"Ниже \\ представлено \\ решение \\ уравнения \\ четвертой \\ степени: \\\\ Вид \\ уравнения: Ax^4 + Bx^3 + Cx^2 + Dx + E = 0 \\\\"
 									+ " Иcходное \\ уравнение: " + coefficientsString[0][1] + "x^4 = 0" + "\\\\"
-									+ coefficientsString[0][1] + "x^4 = 0 \\Rightarrow x = 0 " ;
+									+ coefficientsString[0][1] + "x^4 = 0 \\Rightarrow x = 0 ");
 						} else {
-							solutionDescription = new JLabel("<html><font size = 5>  Ниже представлено решение уравнения четвертой степени<br>"
+							setText("<html><font size = 5>  Ниже представлено решение уравнения четвертой степени<br>"
 									+ "Вид уравнения: A * x<font size=3><sup>4</sup></font> + B * x<font size=3><sup>3</sup></font> + C * x<font size=3><sup>2</sup></font> + "
 									+ "D * x + E = 0 <br><br>" + "Исходное уравнение: " 
 									+ coefficientsString[0][0] + "x<font size=3><sup>4</sup></font>" 
 									+ coefficientsString[4][0] + " = 0<html><br><br>"
 									+ "<html><font size = 5>x<font size=3><sub>1,2,3,4</sub></font> = <sup><small>4</small></sup><font size = 7>&#8730</font>-E/A<br>"
 									+ "x<font size=3><sub>1</sub></font> = " + roots[0] + "<br>x<font size=3><sub>2</sub></font> = " + roots[1]
-									+ "<br>x<font size=3><sub>3</sub></font> = " + roots[2] + "<br>x<font size=3><sub>4</sub></font> = " + roots[3]);
-							textPNG = "Ниже \\ представлено \\ решение \\ уравнения \\ четвертой \\ степени: \\\\ Вид \\ уравнения: Ax^4 + Bx^3 + Cx^2 + Dx + E = 0 \\\\"
+									+ "<br>x<font size=3><sub>3</sub></font> = " + roots[2] + "<br>x<font size=3><sub>4</sub></font> = " + roots[3],
+									"Ниже \\ представлено \\ решение \\ уравнения \\ четвертой \\ степени: \\\\ Вид \\ уравнения: Ax^4 + Bx^3 + Cx^2 + Dx + E = 0 \\\\"
 									+ " Иcходное \\ уравнение: " + coefficientsString[0][1] + "x^4" + 
 									coefficientsString[4][0] + " = 0" + "\\\\ "
 									+ "x = \\sqrt[4]{-\\frac{E}{A}} \\\\ "
-									+ "x_{1} = " + roots[0] + " \\\\ x_{2} = " + roots[1] + " \\\\ x_{3} = " + roots[2] + " \\\\ x_{4} = " + roots[3];
+									+ "x_{1} = " + roots[0] + " \\\\ x_{2} = " + roots[1] + " \\\\ x_{3} = " + roots[2] + " \\\\ x_{4} = " + roots[3]);
 						}
 					} else {
 						if (coefficients[4].isEqualToZero()) {
-							solutionDescription = new JLabel("<html><font size = 5>  Ниже представлено решение уравнения четвертой степени<br>"
+							setText("<html><font size = 5>  Ниже представлено решение уравнения четвертой степени<br>"
 									+ "Вид уравнения: A * x<font size=3><sup>4</sup></font> + B * x<font size=3><sup>3</sup></font> + C * x<font size=3><sup>2</sup></font> + "
 									+ "D * x + E = 0 <br><br>" + "Исходное уравнение: " 
 									+ coefficientsString[0][0] + "x<font size=3><sup>4</sup></font>"
@@ -347,8 +356,8 @@ public class FormationOfSolution {
 									+ "Отсюда видно, что x<sub><small>1</small></sub> = 0<br><br>"
 									+ "Остальные корни находим, решая неполное кубическое уравнение:<br><br> "
 									+ "<html><font size = 5>x<sub><small>2,3,4</small></sub> = <sup><small>3</small></sup><font size = 7>&#8730</font>-E/A<br>"
-									+ "x<sub><small>2</small></sub> = " + roots[0] + "<br>x<sub><small>3</small></sub> = " + roots[1] + "<br>x<sub><small>4</small></sub> = " + roots[2]);
-							textPNG = "Ниже \\ представлено \\ решение \\ уравнения \\ четвертой \\ степени: \\\\ Вид \\ уравнения: Ax^4 + Bx^3 + Cx^2 + Dx + E = 0 \\\\"
+									+ "x<sub><small>2</small></sub> = " + roots[0] + "<br>x<sub><small>3</small></sub> = " + roots[1] + "<br>x<sub><small>4</small></sub> = " + roots[2],
+									"Ниже \\ представлено \\ решение \\ уравнения \\ четвертой \\ степени: \\\\ Вид \\ уравнения: Ax^4 + Bx^3 + Cx^2 + Dx + E = 0 \\\\"
 									+ " Иcходное \\ уравнение: " + coefficientsString[0][1] + "x^4"
 									+ coefficientsString[3][1] + "x" + " = 0" + "\\\\ "
 									+ "Сначала \\ выносим \\ x \\ скобки: " + coefficientsString[0][1] + "x^4"
@@ -357,7 +366,7 @@ public class FormationOfSolution {
 									+ coefficientsString[3][1] + ")x = 0 \\\\ "
 									+ "Отcюда \\ видно, \\ что \\ x_{1} = 0 \\\\ "
 									+ "Остальные \\ корни \\ находим, \\ решая \\ неполное \\ кубическое \\ уравнение: \\\\ "
-									+ "x_{2} = " + roots[0] + " \\\\ x_{3} = " + roots[1] + " \\\\ x_{4} = " + roots[2];
+									+ "x_{2} = " + roots[0] + " \\\\ x_{3} = " + roots[1] + " \\\\ x_{4} = " + roots[2]);
 						} else {
 							the_solution_of_equation_of_fourth_power();
 						}
@@ -365,7 +374,7 @@ public class FormationOfSolution {
 				} else {
 					if (coefficients[3].isEqualToZero()) {
 						if (coefficients[4].isEqualToZero()) {
-							solutionDescription = new JLabel("<html><font size = 5>  Ниже представлено решение уравнения четвертой степени<br>"
+							setText("<html><font size = 5>  Ниже представлено решение уравнения четвертой степени<br>"
 									+ "Вид уравнения: A * x<font size=3><sup>4</sup></font> + B * x<font size=3><sup>3</sup></font> + C * x<font size=3><sup>2</sup></font> + "
 									+ "D * x + E = 0 <br><br>" + "Исходное уравнение: " 
 									+ coefficientsString[0][0] + "x<font size=3><sup>4</sup></font>"
@@ -377,8 +386,8 @@ public class FormationOfSolution {
 									+ "Отсюда видно, что x<sub><small>1,2</small></sub> = 0<br><br>"
 									+ "Остальные корни находим, решая неполное квадратное уравнение " + coefficientsString[0][0] + " * x&sup2"
 									+ coefficientsString[2][0] + " = 0<br><br>"
-									+ "<html><font size = 5>x<sub><small>3</small></sub> = &#8730-C/A<br>x =" + roots[0] + "<br>x<sub><small>4</small></sub> = " + roots[1]);
-							textPNG = "Ниже \\ представлено \\ решение \\ уравнения \\ четвертой \\ степени: \\\\ Вид \\ уравнения: Ax^4 + Bx^3 + Cx^2 + Dx + E = 0 \\\\"
+									+ "<html><font size = 5>x<sub><small>3</small></sub> = &#8730-C/A<br>x =" + roots[0] + "<br>x<sub><small>4</small></sub> = " + roots[1],
+									"Ниже \\ представлено \\ решение \\ уравнения \\ четвертой \\ степени: \\\\ Вид \\ уравнения: Ax^4 + Bx^3 + Cx^2 + Dx + E = 0 \\\\"
 									+ " Иcходное \\ уравнение: " + coefficientsString[0][1] + "x^4"
 									+ coefficientsString[2][1] + "x^2 = 0" + "\\\\ "
 									+ "Сначала \\ выносим \\ x^2 \\ за \\ скобки: \\\\ "
@@ -388,7 +397,7 @@ public class FormationOfSolution {
 									+ coefficientsString[2][1] + ")x^2 = 0 \\\\ "
 									+ "Отcюда \\ видно, \\ что \\ x_{1} = 0 \\\\ "
 									+ "Остальные \\ корни \\ находим, \\ решая \\ неполное \\ квадратное \\ уравнение: \\\\ "
-									+ "x_{2} = " + roots[0] + " \\\\ x_{3} = " + roots[1];
+									+ "x_{2} = " + roots[0] + " \\\\ x_{3} = " + roots[1]);
 						} else {
 							the_solution_of_equation_of_fourth_power();
 						}
@@ -400,7 +409,7 @@ public class FormationOfSolution {
 				if (coefficients[2].isEqualToZero()) {
 					if (coefficients[3].isEqualToZero()) {
 						if (coefficients[4].isEqualToZero()) {
-							solutionDescription = new JLabel("<html><font size = 5>  Ниже представлено решение уравнения четвертой степени<br>"
+							setText("<html><font size = 5>  Ниже представлено решение уравнения четвертой степени<br>"
 									+ "Вид уравнения: A * x<font size=3><sup>4</sup></font> + B * x<font size=3><sup>3</sup></font> + C * x<font size=3><sup>2</sup></font> + "
 									+ "D * x + E = 0 <br><br>" + "Исходное уравнение: " 
 									+ coefficientsString[0][0] + "x<font size=3><sup>4</sup></font>"
@@ -412,8 +421,8 @@ public class FormationOfSolution {
 									+ "Отсюда видно, что x<sub><small>1</small></sub> = 0<br><br>"
 									+ "Второй корень находим, решая линейное уравнение " + coefficientsString[0][0] + " * x"
 									+ coefficientsString[1][0] + " = 0<br><br>"
-									+ "x<sub><small>2</small></sub> = -B/A = " + roots[0]);
-							textPNG = "Ниже \\ представлено \\ решение \\ уравнения \\ четвертой \\ степени: \\\\ Вид \\ уравнения: Ax^4 + Bx^3 + Cx^2 + Dx + E = 0 \\\\"
+									+ "x<sub><small>2</small></sub> = -B/A = " + roots[0],
+									"Ниже \\ представлено \\ решение \\ уравнения \\ четвертой \\ степени: \\\\ Вид \\ уравнения: Ax^4 + Bx^3 + Cx^2 + Dx + E = 0 \\\\"
 									+ " Иcходное \\ уравнение: " + coefficientsString[0][1] + "x^4" + coefficientsString[1][1]
 									+ "x^3 = 0" + "\\\\ "
 									+ "Сначала \\ выносим \\ x^3 \\ за \\ скобки: \\\\ " + coefficientsString[0][1] + "x^4" 
@@ -422,7 +431,7 @@ public class FormationOfSolution {
 									+ ")x^3 = 0 \\\\ "
 									+ "Отcюда \\ видно, \\ что \\ x_{1} = 0 \\\\ "
 									+ "Остальные \\ корни \\ находим, \\ решая \\ линейное \\ уравнение: \\\\ "
-									+ "x_{2} = -\\frac{B}{A} = " + roots[0];
+									+ "x_{2} = -\\frac{B}{A} = " + roots[0]);
 						} else {
 							the_solution_of_equation_of_fourth_power();
 						}
@@ -446,7 +455,7 @@ public class FormationOfSolution {
 							inter_latex = "x_{2} = \\frac{-B - \\sqrt{D}}{2A} = " + roots[1];
 							}
 							String view_x = Interface.calculation.D.isEqualToZero()?"x":"x_{1}";
-							solutionDescription = new JLabel("<html><font size = 5>  Ниже представлено решение уравнения четвертой степени<br>"
+							setText("<html><font size = 5>  Ниже представлено решение уравнения четвертой степени<br>"
 									+ "Вид уравнения: A * x<font size=3><sup>4</sup></font> + B * x<font size=3><sup>3</sup></font> + C * x<font size=3><sup>2</sup></font> + "
 									+ "D * x + E = 0 <br><br>" + "Исходное уравнение: " 
 									+ coefficientsString[0][0] + "x<font size=3><sup>4</sup></font>"
@@ -460,10 +469,10 @@ public class FormationOfSolution {
 									+ coefficientsString[2][0] + ")<br><br>"
 									+ "Отсюда видно, что x<sub><small>1</small></sub> = 0<br><br>"
 									+ "Остальные корни находим, решая квадратное уравнение:<br><br> "
-									+ "Находим дискриминант:<br><br> D = B&sup2 - 4AC = " + output(Interface.calculation.D) + "<html><br><br>"
+									+ "Находим дискриминант:<br><br> D = B&sup2 - 4AC = " + output(Interface.calculation.D, true) + "<html><br><br>"
 									+ "x<sub><small>2</small></sub> = (-B + <font size= 5>&#8730</font>D)/2 = " + roots[0]
-									+ "<html><br><br>" + inter);
-							textPNG = "Ниже \\ представлено \\ решение \\ уравнения \\ четвертой \\ степени: \\\\ Вид \\ уравнения: Ax^4 + Bx^3 + Cx^2 + Dx + E = 0 \\\\"
+									+ "<html><br><br>" + inter,
+									"Ниже \\ представлено \\ решение \\ уравнения \\ четвертой \\ степени: \\\\ Вид \\ уравнения: Ax^4 + Bx^3 + Cx^2 + Dx + E = 0 \\\\"
 									+ " Иcходное \\ уравнение: " + coefficientsString[0][1] + "x^4" + coefficientsString[1][1]
 									+ "x^3" + coefficientsString[2][1] + "x^2 = 0" + "\\\\ "
 									+ "Сначала \\ выносим \\ x^2 \\ за \\ скобки: \\\\ "
@@ -473,8 +482,8 @@ public class FormationOfSolution {
 									+ "x" + coefficientsString[2][1] + ")x^2 = 0 \\\\ "
 									+ "Отcюда \\ видно, \\ что \\ x_{1} = 0 \\\\ "
 									+ "Остальные \\ корни \\ находим, \\ решая \\ квадратное \\ уравнение: \\\\ "
-									+ "Находим \\ дискриминант: D = B^2 - 4AC = " + output(Interface.calculation.D) + " \\\\ "
-									+ view_x + " = \\frac{-B + \\sqrt{D}}{2A} = " + roots[0] + "\\\\" + inter_latex;
+									+ "Находим \\ дискриминант: D = B^2 - 4AC = " + output(Interface.calculation.D, false) + " \\\\ "
+									+ view_x + " = \\frac{-B + \\sqrt{D}}{2A} = " + roots[0] + "\\\\" + inter_latex);
 						} else {
 							the_solution_of_equation_of_fourth_power();
 						}
@@ -509,12 +518,12 @@ public class FormationOfSolution {
 		return equation;
 	}
 	private void the_solution_of_the_linear_equation() {
-		solutionDescription = new JLabel("<html><font size = 5>Ниже представлено решение линейного уравнения<br>"
+		setText("<html><font size = 5>Ниже представлено решение линейного уравнения<br>"
 				+ "Вид уравнения: Ax + B = 0<br><br>" + "Иcходное уравнение: "
-				+ coefficientsString[3][0] + "x" + coefficientsString[4][0] + " = 0<br><br>x = -B/A = " + roots[0]);
-		textPNG = "Ниже \\ представлено \\ решение \\ линейного \\ уравнения \\ \\\\"
+				+ coefficientsString[3][0] + "x" + coefficientsString[4][0] + " = 0<br><br>x = -B/A = " + roots[0],
+				"Ниже \\ представлено \\ решение \\ линейного \\ уравнения \\ \\\\"
 				+ "Вид \\ уравнения: \\ Ax + B = 0 \\\\ Иcходное \\ уравнение: " + correct_equation_view(coefficientsString[3][1], coefficientsString[4][1]) + " = 0\\\\"
-				+ "x = -B/A = " + roots[0];
+				+ "x = -B/A = " + roots[0]);
 	}
 	private void the_solution_of_the_quadratic_equation() {
 		String inter,inter_latex;
@@ -527,128 +536,128 @@ public class FormationOfSolution {
 		inter_latex = "x_{2} = \\frac{-B - \\sqrt{D}}{2A} = " + roots[1];
 		}
 		String view_x = Interface.calculation.D.isEqualToZero()?"x":"x_{1}";
-		solutionDescription = new JLabel("<html><font size = 5>Ниже представлено решение квадратного уравнения<br>"
+		setText("<html><font size = 5>Ниже представлено решение квадратного уравнения<br>"
 				+ "Вид уравнения: Ax&sup2 + Bx + C = 0<br><br>" + "Исходное уравнение: "
 				+ coefficientsString[2][0] + "x&sup2"
 				+ coefficientsString[3][0] + "x"
 				+ coefficientsString[4][0] + " = 0<br><br>Находим дискриминант:<br><br>"
-				+ "D = B&sup2 - 4AC = " + output(Interface.calculation.D) + "<html><br><br>"
-				+ "x<sub><small>1</small></sub> = (-B + <font size= 5>&#8730</font>D)/2 = " + roots[0] + "<html><br><br>" + inter);
-		textPNG = "Ниже \\ представлено \\ решение \\ квадратного \\ уравнения \\ \\\\"
+				+ "D = B&sup2 - 4AC = " + output(Interface.calculation.D, true) + "<html><br><br>"
+				+ "x<sub><small>1</small></sub> = (-B + <font size= 5>&#8730</font>D)/2 = " + roots[0] + "<html><br><br>" + inter,
+				"Ниже \\ представлено \\ решение \\ квадратного \\ уравнения \\ \\\\"
 				+ "Вид \\ уравнения: \\ Ax^2 + Bx + C = 0 \\\\ Иcходное \\ уравнение: " 
 				+ correct_equation_view(coefficientsString[2][1], coefficientsString[3][1], coefficientsString[4][1])
-				+ " = 0\\\\" + "Находим \\ дискриминант: D = B^2 - 4AC = " + output(Interface.calculation.D) + "\\\\"
-				+ view_x + " = \\frac{-B + \\sqrt{D}}{2A} = " + roots[0] + "\\\\" + inter_latex;
+				+ " = 0\\\\" + "Находим \\ дискриминант: D = B^2 - 4AC = " + output(Interface.calculation.D, false) + "\\\\"
+				+ view_x + " = \\frac{-B + \\sqrt{D}}{2A} = " + roots[0] + "\\\\" + inter_latex);
 	}
 
 	private void the_solution_of_the_cubic_equation() {
-		solutionDescription = new JLabel("<html><font size = 5>Ниже представлено решение кубического уравнения по методу Кардано<br>"
+		setText("<html><font size = 5>Ниже представлено решение кубического уравнения по методу Кардано<br>"
 				+ "Вид уравнения: Ax&sup3 + Bx&sup2 + Cx + D = 0<br><br>" + "Исходное уравнение: "
 				+ coefficientsString[1][0] + "x&sup3"
 				+ coefficientsString[2][0] + "x&sup2"
 				+ coefficientsString[3][0] + "x"
 				+ coefficientsString[3][0] + " = 0<br><br><html> Сначала находим значение двух промежуточных чисел: P и Q<br><br>"
 				+ "<p><font size=5 face=Arial>P = (3AC - B&sup2)/3A&sup2 = "
-				+ output(Interface.calculation.p) + "<html><br><br>"
+				+ output(Interface.calculation.p, true) + "<html><br><br>"
 				+ "<html><p><font size=5 face=Arial>  Q = (2B&sup3 - 9ABC + 27A&sup2D)/27A&sup3 = "
-				+ output(Interface.calculation.q) + "<html><br><br>" + "Далее определяем S:<br><br>"
-				+ "S = (P/3)&sup3 + (Q/2)&sup2<br><br> = " + output(Interface.calculation.Q)
-				+ "Затем находим α и β:<br>"
-				+ "α = <sup><small>3</small></sup><font size= 7>&#8730</font>(-Q/2 + &#8730S) = "
-				+ output(Interface.calculation.α)
-				+ "<br>β = <sup><small>3</small></sup><font size= 7>&#8730</font>(-Q/2 - &#8730S) = "
-				+ output(Interface.calculation.β[Interface.calculation.right_β])
+				+ output(Interface.calculation.q, true) + "<html><br><br>" + "Далее определяем S:<br><br>"
+				+ "S = (P/3)&sup3 + (Q/2)&sup2<br><br> = " + output(Interface.calculation.Q, true)
+				+ "Затем находим &#945 и &#946:<br>"
+				+ "&#945 = <sup><small>3</small></sup><font size= 7>&#8730</font>(-Q/2 + &#8730S) = "
+				+ output(Interface.calculation.α, true)
+				+ "<br>&#946 = <sup><small>3</small></sup><font size= 7>&#8730</font>(-Q/2 - &#8730S) = "
+				+ output(Interface.calculation.β[Interface.calculation.right_β], true)
 				+ "<br><br>Предпоследним шагом находим y<sub><small>1</small></sub>, y<sub><small>2</small></sub> и y<sub><small>3</small></sub>:<br><br>"
-				+ "y<sub><small>1</small></sub> = α + β = " + output(Interface.calculation.Y[0]) + "<br><br>"
-				+ "y<sub><small>2</small></sub> = -(α + β)/2 + (α - β)*&#8730 3/2 * i = "
-				+ output(Interface.calculation.Y[1]) + "<br><br>"
-				+ "y<sub><small>3</small></sub> = -(α + β)/2 - (α - β)*&#8730 3/2 * i = "
-				+ output(Interface.calculation.Y[2]) + "<br><br>"
+				+ "y<sub><small>1</small></sub> = &#945 + &#946 = " + output(Interface.calculation.Y[0], true) + "<br><br>"
+				+ "y<sub><small>2</small></sub> = -(&#945 + &#946)/2 + (&#945 - &#946)*&#8730 3/2 * i = "
+				+ output(Interface.calculation.Y[1], true) + "<br><br>"
+				+ "y<sub><small>3</small></sub> = -(&#945 + &#946)/2 - (&#945 - &#946)*&#8730 3/2 * i = "
+				+ output(Interface.calculation.Y[2], true) + "<br><br>"
 				+ "И наконец - находим корни уравнения:<br><br>"
 				+ "  x<sub><small>1</small></sub> = -B/3A + y<sub><small>1</small></sub> = " + roots[0] + "<html><br><br>"
 				+ "  x<sub><small >2</small></sub> = -B/3A + y<sub><small>2</small></sub> = " + roots[1] + "<html><br><br>"
-				+ "  x<sub><small>3</small></sub> = -B/3A + y<sub><small>3</small></sub> = " + roots[2] + "</html>");
-		textPNG = "Ниже \\ представлено \\ решение \\ кубического \\ уравнения \\ по \\ методу \\ Кардано \\\\"
+				+ "  x<sub><small>3</small></sub> = -B/3A + y<sub><small>3</small></sub> = " + roots[2] + "</html>",
+				"Ниже \\ представлено \\ решение \\ кубического \\ уравнения \\ по \\ методу \\ Кардано \\\\"
 				+ "Вид \\ уравнения: Ax^3 + Bx^2 + Cx + D = 0 \\\\ Иcходное \\ уравнение : " 
 				+ correct_equation_view(coefficientsString[1][1], coefficientsString[2][1], coefficientsString[3][1], coefficientsString[4][1]) + " = 0 \\\\"
 				+ "Сначала \\ находим \\ значение \\ двух \\ промежуточных \\ чисел: P \\ и \\ Q: \\\\ P = \\frac{3AC - B^2}{3A^2} = "
-				+ output(Interface.calculation.p) + "\\\\" + "Q = \\frac{2B^3 - 9ABC + 27A^2D}{27A^3} = "
-				+ output(Interface.calculation.q) + "\\\\ \\\\" + "Далее \\ определяем \\ S: \\\\"
-				+ "S = \\frac{P^3}{27} + \\frac{Q^2}{4} = " + output(Interface.calculation.Q) + "\\\\"
+				+ output(Interface.calculation.p, false) + "\\\\" + "Q = \\frac{2B^3 - 9ABC + 27A^2D}{27A^3} = "
+				+ output(Interface.calculation.q, false) + "\\\\ \\\\" + "Далее \\ определяем \\ S: \\\\"
+				+ "S = \\frac{P^3}{27} + \\frac{Q^2}{4} = " + output(Interface.calculation.Q, false) + "\\\\"
 				+ "Затем \\ находим \\ α \\ и  \\ β: \\\\ α = \\sqrt{-Q/2 + \\sqrt{S}} = "
-				+ output(Interface.calculation.α) + "\\\\" + "β \\ = \\sqrt{-Q/2 - \\sqrt{S}} = "
-				+ output(Interface.calculation.β[Interface.calculation.right_β]) + "\\\\"
+				+ output(Interface.calculation.α, false) + "\\\\" + "β \\ = \\sqrt{-Q/2 - \\sqrt{S}} = "
+				+ output(Interface.calculation.β[Interface.calculation.right_β], false) + "\\\\"
 				+ "Предпоследним \\ шагом \\ находим \\ y_{1}, \\ y_{2} \\ и \\ y_{3}: \\\\" + "y_{1} = α + β = "
-				+ output(Interface.calculation.Y[0]) + "\\\\"
-				+ "y_{2} = -(α + β) + \\frac{\\sqrt{3}(α - β)}{2} * i = " + output(Interface.calculation.Y[1])
+				+ output(Interface.calculation.Y[0], false) + "\\\\"
+				+ "y_{2} = -(α + β) + \\frac{\\sqrt{3}(α - β)}{2} * i = " + output(Interface.calculation.Y[1], false)
 				+ "\\\\" + "y_{3} = -(α + β) - \\frac{\\sqrt{3}(α - β)}{2} * i = "
-				+ output(Interface.calculation.Y[2]) + "\\\\"
+				+ output(Interface.calculation.Y[2], false) + "\\\\"
 				+ "И \\ наконец \\ - \\ находим \\ корни \\ уравнения: \\\\" + "x_{1} = -\\frac{B}{3A} + y_{1} = " + roots[0]
-				+ "\\\\ x_{2} = -\\frac{B}{3A} + y_{2} = " + roots[1] + "\\\\ x_{3} = -\\frac{B}{3A} + y_{3} = " + roots[2];
+				+ "\\\\ x_{2} = -\\frac{B}{3A} + y_{2} = " + roots[1] + "\\\\ x_{3} = -\\frac{B}{3A} + y_{3} = " + roots[2]);
 	}
 
 	private void the_solution_of_equation_of_fourth_power() {
-		String tmp = "<html><font size = 5>  Ниже представлено решение уравнения четвертой степени по методу Феррари<br>"
+		setText("<html><font size = 5>  Ниже представлено решение уравнения четвертой степени по методу Феррари<br>"
 				+ "Вид уравнения: A * x<font size=3><sup>4</sup></font> + B * x<font size=3><sup>3</sup></font> + C * x<font size=3><sup>2</sup></font> + "
 				+ "D * x + E = 0 <br><br>" + "Исходное уравнение: " 
 				+ coefficientsString[0][0] + "x<font size=3><sup>4</sup></font>"
 				+ coefficientsString[1][0] + "x<font size=3><sup>3</sup></font>"
 				+ coefficientsString[2][0] + "x<font size=3><sup>2</sup></font>"
 				+ coefficientsString[3][0] + "x"
-				+ coefficientsString[4][0] + " = 0<html><br><br><html> Сначала находим значение трёх промежуточных чисел: α, β и γ<br><br>"
-				+ "<p><font size=5 face=Arial>α = -3B&sup2/8A&sup2 + C/A = "
-				+ output(Interface.calculation.α) + "<html><br><br>"
-				+ "<html><p><font size=5 face=Arial>  β = B&sup3/8A&sup2 - BC/2A&sup2 + D/A = "
-				+ (Interface.calculation.β[0].isEqualToZero()?"0":output(Interface.calculation.β[0])) + "<html><br><br> "
-				+ "γ = -3B<font size=4><sup>4</sup></font>/256A<font size=4><sup>4</sup></font> + B&sup2/16A&sup3 - BD/4A&sup2 + E/A = "
-				+ output(Interface.calculation.γ) + "<html><br><br>";
-		textPNG = "Ниже \\ представлено \\ решение \\ уравнения \\ четвертой \\ степени \\ по \\ методу \\ Феррари \\\\"
-				+ "Вид \\ уравнения: \\ Ax^4 + Bx^3 + Cx^2 + Dx + E = 0 \\\\" + "Иcходное \\ уравнение : " + correct_equation_view(coefficientsString[0][1], coefficientsString[1][1], coefficientsString[2][1], coefficientsString[3][1], coefficientsString[4][1])
+				+ coefficientsString[4][0] + " = 0<html><br><br><html> Сначала находим значение трёх промежуточных чисел: &#945, &#946 и &#947<br><br>"
+				+ "<p><font size=5 face=Arial>&#945 = -3B&sup2/8A&sup2 + C/A = "
+				+ output(Interface.calculation.α, true) + "<html><br><br>"
+				+ "<html><p><font size=5 face=Arial>  &#946 = B&sup3/8A&sup2 - BC/2A&sup2 + D/A = "
+				+ (Interface.calculation.β[0].isEqualToZero()?"0":output(Interface.calculation.β[0], true)) + "<html><br><br> "
+				+ "&#947 = -3B<font size=4><sup>4</sup></font>/256A<font size=4><sup>4</sup></font> + B&sup2/16A&sup3 - BD/4A&sup2 + E/A = "
+				+ output(Interface.calculation.γ, true) + "<html><br><br>",
+				"Ниже \\ представлено \\ решение \\ уравнения \\ четвертой \\ степени \\ по \\ методу \\ Феррари \\\\"
+				+ "Вид \\ уравнения: \\ Ax^4 + Bx^3 + Cx^2 + Dx + E = 0 \\\\" + "Иcходное \\ уравнение : " + 
+				correct_equation_view(coefficientsString[0][1], coefficientsString[1][1], coefficientsString[2][1], coefficientsString[3][1], coefficientsString[4][1])
 				+ " = 0\\\\ Сначала \\ находим \\ значение \\ трёх \\ промежуточных \\ чисел: \\ α, \\ β \\ и \\ γ \\\\"
-				+ "α = -\\frac{3B^2}{8A^2} + \\frac{C}{A} = " + output(Interface.calculation.α)
+				+ "α = -\\frac{3B^2}{8A^2} + \\frac{C}{A} = " + output(Interface.calculation.α, false)
 				+ "\\\\ β = \\frac{B^3}{8A^2} - \\frac{BC}{2A^2} + \\frac{D}{A} = "
-				+ (Interface.calculation.β[0].isEqualToZero()?"0":output(Interface.calculation.β[0])) + "\\\\"
+				+ (Interface.calculation.β[0].isEqualToZero()?"0":output(Interface.calculation.β[0], false)) + "\\\\"
 				+ "γ = -\\frac{3B^4}{256A^4} + \\frac{B^2}{16A^3} - \\frac{BD}{4A^2} + \\frac{E}{A} = "
-				+ output(Interface.calculation.γ);
+				+ output(Interface.calculation.γ, false));
 		if (Interface.calculation.β[0].isEqualToZero()) {
-			solutionDescription = new JLabel(
-					tmp + "  β = 0, =&gt, решив биквадратное уравнение u<font size=4><sup>4</sup></font> + αu&sup2 + γ<br>"
+			setText("  &#946 = 0, =&gt, решив биквадратное уравнение u<font size=4><sup>4</sup></font> + αu&sup2 + &#947<br>"
 					+ "  и подставив x = u - B/4A, мы найдем 4 корня:<br><br>"
-					+ "  x<sub><small>1</small></sub> = -B/4A + <font size= 7>&#8730</font>((-α + &#8730(α&sup2 - 4γ))/2) = "
+					+ "  x<sub><small>1</small></sub> = -B/4A + <font size= 7>&#8730</font>((-&#945 + &#8730(&#945&sup2 - 4γ))/2) = "
 					+ roots[0] + "<html><br><br>"
-					+ "  x<sub><small>2</small></sub> = -B/4A - <font size= 7>&#8730</font>((-α + &#8730(α&sup2 - 4γ))/2) = "
+					+ "  x<sub><small>2</small></sub> = -B/4A - <font size= 7>&#8730</font>((-&#945 + &#8730(&#945&sup2 - 4γ))/2) = "
 					+ roots[1] + "<html><br><br>"
-					+ "  x<sub><small>3</small></sub> = -B/4A + <font size= 7>&#8730</font>((-α - &#8730(α&sup2 - 4γ))/2) = "
+					+ "  x<sub><small>3</small></sub> = -B/4A + <font size= 7>&#8730</font>((-&#945 - &#8730(&#945&sup2 - 4γ))/2) = "
 					+ roots[2] + "<html><br><br>"
-					+ "  x<sub><small>4</small></sub> = -B/4A - <font size= 7>&#8730</font>((-α - &#8730(α&sup2 - 4γ))/2) = "
-					+ roots[3] + "<html><br><br>");
-			textPNG += "\\\\ β = 0 \\Rightarrow решив \\ биквадратное \\ уравнение \\ u^4 + αu^2 + γ = 0 \\\\ и \\ подставив \\ x = u - \\frac{B}{4A}, мы \\ найдем \\ 4 \\ корня: \\\\"
+					+ "  x<sub><small>4</small></sub> = -B/4A - <font size= 7>&#8730</font>((-&#945 - &#8730(&#945&sup2 - 4γ))/2) = "
+					+ roots[3] + "<html><br><br>",
+					"\\\\ β = 0 \\Rightarrow решив \\ биквадратное \\ уравнение \\ u^4 + αu^2 + γ = 0 \\\\ и \\ подставив \\ x = u - \\frac{B}{4A}, мы \\ найдем \\ 4 \\ корня: \\\\"
 					+ "x_{1} = -\\frac{B}{4A} + \\sqrt{\\frac{-α + \\sqrt{α^2 - 4γ}}{2}} = " + roots[0] + "\\\\"
 					+ "x_{2} = -\\frac{B}{4A} - \\sqrt{\\frac{-α + \\sqrt{α^2 - 4γ}}{2}} = " + roots[1] + "\\\\"
 					+ "x_{3} = -\\frac{B}{4A} + \\sqrt{\\frac{-α - \\sqrt{α^2 - 4γ}}{2}} = " + roots[2] + "\\\\"
-					+ "x_{4} = -\\frac{B}{4A} - \\sqrt{\\frac{-α - \\sqrt{α^2 - 4γ}}{2}} = " + roots[3];
+					+ "x_{4} = -\\frac{B}{4A} - \\sqrt{\\frac{-α - \\sqrt{α^2 - 4γ}}{2}} = " + roots[3]);
 		} else {
-			tmp += "<html>  β &#8800 0 =&gt" + "  находим значение следующих трёх промежуточных чисел: P, Q и R<br><br>"
-					+ "  P = -α&sup2/12 - γ = " + output(Interface.calculation.p) + "<html><br><br>"
-					+ "  Q = -α&sup3/108 + αγ/3 - β&sup2/8 = " + output(Interface.calculation.q)
+			setText("<html>  &#946 &#8800 0 =&gt" + "  находим значение следующих трёх промежуточных чисел: P, Q и R<br><br>"
+					+ "  P = -&#945&sup2/12 - &#947 = " + output(Interface.calculation.p, true) + "<html><br><br>"
+					+ "  Q = -&#945&sup3/108 + αγ/3 - &#946&sup2/8 = " + output(Interface.calculation.q, true)
 					+ "<html><br><br>" + "  R = -Q/2 + <font size= 7>&#8730</font>(Q&sup2/4 + P&sup3/27) = "
-					+ output(Interface.calculation.R) + "<br><br>" + "  Затем находим U:<br><br>"
+					+ output(Interface.calculation.R, true) + "<br><br>" + "  Затем находим U:<br><br>"
 					+ "  U = <sup><small>3</small></sup><font size= 7>&#8730</font>R = "
-					+ output(Interface.calculation.U) + "<br>"
-					+ "  (любой корень подойдёт, поэтому выбираем первый корень)<br><br>";
-			textPNG += " \\\\ β \\neq 0 \\Rightarrow находим \\ значение \\ следующих \\ трёх \\ промежуточных \\ чисел: P, \\ Q \\ и \\ R: \\\\"
-					+ "P = -\\frac{α^2}{12} - γ = " + output(Interface.calculation.p) + "\\\\"
+					+ output(Interface.calculation.U, true) + "<br>"
+					+ "  (любой корень подойдёт, поэтому выбираем первый корень)<br><br>",
+					" \\\\ β \\neq 0 \\Rightarrow находим \\ значение \\ следующих \\ трёх \\ промежуточных \\ чисел: P, \\ Q \\ и \\ R: \\\\"
+					+ "P = -\\frac{α^2}{12} - γ = " + output(Interface.calculation.p, false) + "\\\\"
 					+ "Q = -\\frac{α^3}{108} + \\frac{αγ}{3} - \\frac{β^2}{8} = "
-					+ output(Interface.calculation.q) + "\\\\"
+					+ output(Interface.calculation.q, false) + "\\\\"
 					+ "R = -\\frac{Q}{2} + \\sqrt{\\frac{Q^2}{4} + \\frac{P^3}{27}} = "
-					+ output(Interface.calculation.R) + "\\\\" + "Затем \\ находим \\ U: \\\\"
-					+ "U = \\sqrt[3]{R} = " + output(Interface.calculation.U)
-					+ "\\\\ (любой \\ корень \\ подойдёт, \\ поэтому \\ выбираем \\ первый \\ корень)";
+					+ output(Interface.calculation.R, false) + "\\\\" + "Затем \\ находим \\ U: \\\\"
+					+ "U = \\sqrt[3]{R} = " + output(Interface.calculation.U, false)
+					+ "\\\\ (любой \\ корень \\ подойдёт, \\ поэтому \\ выбираем \\ первый \\ корень)");
 			if (Interface.calculation.U.isEqualToZero()) {
-			solutionDescription = new JLabel(tmp + "<html>  U = 0 =&gt находим Y<br><br>"
+			setText("<html>  U = 0 =&gt находим Y<br><br>"
 					+ "  Y = -5α/6 + U - <sup><small>3</small></sup><font size= 5>&#8730</font>Q = "
-					+ output(Interface.calculation.Y[0]) + "<br><br>" + "  Далее находим W:<br><br>"
-					+ "  W = <font size= 7>&#8730</font>(α + 2Y) = " + output(Interface.calculation.W)
+					+ output(Interface.calculation.Y[0], true) + "<br><br>" + "  Далее находим W:<br><br>"
+					+ "  W = <font size= 7>&#8730</font>(&#945 + 2Y) = " + output(Interface.calculation.W, true)
 					+ "<br><br>" + "  И наконец - находим корни уравнения:<br><br>"
 					+ "  x<sub><small>1</small></sub> = -B/4A + (W + <font size= 7>&#8730</font>(-(3α + 2Y + 2β/W)))/2 = "
 					+ roots[0] + "<html><br>"
@@ -657,22 +666,22 @@ public class FormationOfSolution {
 					+ "  x<sub><small>3</small></sub> = -B/4A + (-W + <font size= 7>&#8730</font>(-(3α + 2Y - 2β/W)))/2 = "
 					+ roots[2] + "<html><br>"
 					+ "  x<sub><small>4</small></sub> = -B/4A + (-W - <font size= 7>&#8730</font>(-(3α + 2Y - 2β/W)))/2 = "
-					+ roots[3]);
-			textPNG += "\\\\ U = 0 \\Rightarrow находим \\ Y \\\\ Y = -\\frac{5α}{6} + U - \\sqrt[3]{Q} = "
-					+ output(Interface.calculation.Y[0]) + "\\\\"
+					+ roots[3],
+					"\\\\ U = 0 \\Rightarrow находим \\ Y \\\\ Y = -\\frac{5α}{6} + U - \\sqrt[3]{Q} = "
+					+ output(Interface.calculation.Y[0], false) + "\\\\"
 					+ "Далее \\ находим \\ W: \\\\ W = \\sqrt{α + 2Y} = "
-					+ output(Interface.calculation.W) + "\\\\"
+					+ output(Interface.calculation.W, false) + "\\\\"
 					+ "И \\ наконец \\ - \\ находим \\ корни \\ уравнения: \\\\"
 					+ "x_{1} = -\\frac{B}{4A} + \\frac{W + \\sqrt{-3α - 2Y - \\frac{2β}{W}}}{2} = " + roots[0] + "\\\\"
 					+ "x_{2} = -\\frac{B}{4A} + \\frac{W - \\sqrt{-3α - 2Y - \\frac{2β}{W}}}{2} = " + roots[1] + "\\\\"
 					+ "x_{3} = -\\frac{B}{4A} + \\frac{-W + \\sqrt{-3α - 2Y + \\frac{2β}{W}}}{2} = " + roots[2] + "\\\\"
-					+ "x_{4} = -\\frac{B}{4A} + \\frac{-W - \\sqrt{-3α - 2Y + \\frac{2β}{W}}}{2} = " + roots[3];
+					+ "x_{4} = -\\frac{B}{4A} + \\frac{-W - \\sqrt{-3α - 2Y + \\frac{2β}{W}}}{2} = " + roots[3]);
 			}
 			else {
-			solutionDescription = new JLabel(tmp + "<html>  U &#8800 0 =&gt находим Y<br><br>"
-					+ "  Y = -5α/6 + U - P/3U = " + output(Interface.calculation.Y[0]) + "<br><br>"
-					+ "  Далее находим W:<br><br>" + "  W = <font size= 7>&#8730</font>(α + 2Y) = "
-					+ output(Interface.calculation.W) + "<br><br>"
+			setText("<html>  U &#8800 0 =&gt находим Y<br><br>"
+					+ "  Y = -5α/6 + U - P/3U = " + output(Interface.calculation.Y[0], true) + "<br><br>"
+					+ "  Далее находим W:<br><br>" + "  W = <font size= 7>&#8730</font>(&#945 + 2Y) = "
+					+ output(Interface.calculation.W, true) + "<br><br>"
 					+ "  И наконец - находим корни уравнения:<br><br>"
 					+ "  x<sub><small>1</small></sub> = -B/4A + (W + <font size= 7>&#8730</font>(-(3α + 2Y + 2β/W)))/2 = "
 					+ roots[0] + "<html><br>"
@@ -681,16 +690,16 @@ public class FormationOfSolution {
 					+ "  x<sub><small>3</small></sub> = -B/4A + (-W + <font size= 7>&#8730</font>(-(3α + 2Y - 2β/W)))/2 = "
 					+ roots[2] + "<html><br>"
 					+ "  x<sub><small>4</small></sub> = -B/4A + (-W - <font size= 7>&#8730</font>(-(3α + 2Y - 2β/W)))/2 = "
-					+ roots[3]);
-			textPNG += "\\\\ U \\neq 0 \\Rightarrow находим \\ Y \\\\ Y = -\\frac{5α}{6} + U - \\frac{P}{3U} = "
-					+ output(Interface.calculation.Y[0]) + "\\\\"
+					+ roots[3],
+					"\\\\ U \\neq 0 \\Rightarrow находим \\ Y \\\\ Y = -\\frac{5α}{6} + U - \\frac{P}{3U} = "
+					+ output(Interface.calculation.Y[0], false) + "\\\\"
 					+ "Далее \\ находим \\ W: \\\\ W = \\sqrt{α + 2Y} = "
-					+ output(Interface.calculation.W) + "\\\\"
+					+ output(Interface.calculation.W, false) + "\\\\"
 					+ "И \\ наконец \\ - \\ находим \\ корни \\ уравнения: \\\\"
 					+ "x_{1} = -\\frac{B}{4A} + \\frac{W + \\sqrt{-3α - 2Y - \\frac{2β}{W}}}{2} = " + roots[0] + "\\\\"
 					+ "x_{2} = -\\frac{B}{4A} + \\frac{W - \\sqrt{-3α - 2Y - \\frac{2β}{W}}}{2} = " + roots[1] + "\\\\"
 					+ "x_{3} = -\\frac{B}{4A} + \\frac{-W + \\sqrt{-3α - 2Y + \\frac{2β}{W}}}{2} = " + roots[2] + "\\\\"
-					+ "x_{4} = -\\frac{B}{4A} + \\frac{-W - \\sqrt{-3α - 2Y + \\frac{2β}{W}}}{2} = " + roots[3];
+					+ "x_{4} = -\\frac{B}{4A} + \\frac{-W - \\sqrt{-3α - 2Y + \\frac{2β}{W}}}{2} = " + roots[3]);
 			}
 		}
 	}
