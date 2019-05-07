@@ -501,16 +501,11 @@ public class FormationOfSolution {
 	
 	private String correct_equation_view(String... n) {
 		boolean isNormalView = Interface.isNormalView;
-		if (n.length > 2) {
-		n[n.length-3] = (n[n.length-3].isEmpty())?"":isNormalView?n[n.length-3] + "x^2":n[n.length-3] + " * x^2";
-		if (n.length > 3) {
-		n[n.length-4] = (n[n.length-4].isEmpty())?"":isNormalView?n[n.length-4] + "x^3":n[n.length-4] + " * x^3";	
-		if (n.length > 4) {
-		n[n.length-5] = (n[n.length-5].isEmpty())?"":isNormalView?n[n.length-5] + "x^4":n[n.length-5] + " * x^4";
+		for (int i = 1; i < 5; i++) {
+			if (n.length > i) {
+				n[n.length-i-1] = (n[n.length-i-1].isEmpty())?"":isNormalView?n[n.length-i-1] + "x"+(i!=1?"^"+i:""):n[n.length-i-1] + " * x"+(i!=1?"^"+i:"");
+			}
 		}
-		}
-		}
-		n[n.length-2] = (n[n.length-2].isEmpty())?"":isNormalView?n[n.length-2] + "x":n[n.length-2] + " * x";
 		String equation = n.length > 4?n[n.length-5] + n[n.length-4] + n[n.length-3] + n[n.length-2] + n[n.length-1]
 		:n.length > 3?n[n.length-4] + n[n.length-3] + n[n.length-2] + n[n.length-1]
 		:n.length > 2?n[n.length-3] + n[n.length-2] + n[n.length-1]
