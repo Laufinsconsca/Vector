@@ -256,7 +256,7 @@ public class ComplexBigDecimal {
 	/**
 	 * Извлечение всех корней степени n из числа z
 	 * @param n степень корня
-	 * @return <html>n комплексных корней вида<font size= 5><sup><small>n</small></sup>&#8730|x|*(cos((arg(x) + 2*&#960*k)/n) + i * sin((arg(x) + 2*&#960*k)/n))</html>
+	 * @return <html>n комплексных корней вида<font size= 5><sup><small>n</small></sup> &#8730|x|*(cos((arg(x) + 2*&#960*k)/n) + i * sin((arg(x) + 2*&#960*k)/n)) </html>
 	 */
 	
 	public ComplexBigDecimal[] root(int n, int accuracyCalculation) {
