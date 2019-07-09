@@ -253,23 +253,6 @@ public class ComplexBigDecimal {
 		return result;
 	}
 	
-	/**
-	 * Извлечение всех корней степени n из числа z
-	 * @param n степень корня
-	 * @return <html>n комплексных корней вида<font size= 5><sup><small>n</small></sup> &#8730|x|*(cos((arg(x) + 2*&#960*k)/n) + i * sin((arg(x) + 2*&#960*k)/n)) </html>
-	 */
-	
-	public ComplexBigDecimal[] root(int n, int accuracyCalculation) {
-		ComplexBigDecimal[] output = new ComplexBigDecimal[n];
-		final Apcomplex input = new Apcomplex(new Apfloat(real, Main.ACCURACY_CALCULATION), new Apfloat(imag, Main.ACCURACY_CALCULATION));
-		for (int i = 0; i < n; i++) {
-			output[i] = new ComplexBigDecimal();
-			output[i].setReal(new BigDecimal(ApcomplexMath.allRoots(input, n)[i].real().toString()).setScale(accuracyCalculation, BigDecimal.ROUND_CEILING));
-			output[i].setImag(new BigDecimal(ApcomplexMath.allRoots(input, n)[i].imag().toString()).setScale(accuracyCalculation, BigDecimal.ROUND_CEILING));
-		}
-		return output;
-	}
-	
 	public ComplexBigDecimal setScale(int scale, int type_of_rounding) {
 		real = real.setScale(scale, type_of_rounding);
 		imag = imag.setScale(scale, type_of_rounding);
@@ -468,5 +451,22 @@ public class ComplexBigDecimal {
 		} else {
 			return 0;
 		}
+	}
+	
+	/**
+	 * Извлечение всех корней степени n из числа z
+	 * @param n степень корня
+	 * @return <html>n комплексных корней вида<font size= 5><sup><small>n</small></sup> &#8730|x|*(cos((arg(x) + 2*&#960*k)/n) + i * sin((arg(x) + 2*&#960*k)/n)) </html>
+	 */
+	
+	public ComplexBigDecimal[] root(int n, int accuracyCalculation) {
+		ComplexBigDecimal[] output = new ComplexBigDecimal[n];
+		final Apcomplex input = new Apcomplex(new Apfloat(real, Main.ACCURACY_CALCULATION), new Apfloat(imag, Main.ACCURACY_CALCULATION));
+		for (int i = 0; i < n; i++) {
+			output[i] = new ComplexBigDecimal();
+			output[i].setReal(new BigDecimal(ApcomplexMath.allRoots(input, n)[i].real().toString()).setScale(accuracyCalculation, BigDecimal.ROUND_CEILING));
+			output[i].setImag(new BigDecimal(ApcomplexMath.allRoots(input, n)[i].imag().toString()).setScale(accuracyCalculation, BigDecimal.ROUND_CEILING));
+		}
+		return output;
 	}
 }
