@@ -394,7 +394,7 @@ public class Interface extends JFrame {
 			if (event.getSource() == aboutButton) {
 				JOptionPane.showMessageDialog(null, "Программа предназначена для вычисления корней \n" + "уравнения четвертой степени, \n" 
 			        	+ "кубического уравнения или квадратного уравнения \n" + "с любыми коэффициентами. "
-			        	+ "\n" + "Разработчик: Валентин Логачев \n" + "\n                                   2017-2019 год", "О программе", JOptionPane.INFORMATION_MESSAGE);
+			        	+ "\n" + "Разработчик: Валентин Логачев \n" + "\n\n                                 2017-2019 год", "О программе", JOptionPane.INFORMATION_MESSAGE);
 				focus();
 			}
 		}
